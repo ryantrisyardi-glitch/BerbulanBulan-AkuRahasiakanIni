@@ -1908,9 +1908,120 @@
     /* ══ PHOTO IDs ══ */
     const PH = ['1xxwZmTBW0_sDSm_igh0M8DWIOJMmU4jV', '16Qgqj15hnkQOf7Vz7wyoAtKVG1QFEZcL', '1XTI3N5DE3lHXjc1NbhCfbSHVveE-jdzE', '1jgzR8Q1pPK4nbJEtKLwm-oweqxFg4ooB', '14wD339bLqgG9D-XcjwM41fAdtlT4XAA-', '1KX2v4xkrp6IYF1RKKlm8XWI_ecLb7SZR', '1-6Hel73R2EyEM1uDUqtrsJtcJ86Q9v46', '187qmWg3p55q9yc853DA8xT3E6qXJEIJr', '1yxsYeNPV9Np2Z6WhhT4FfRW5s99-ZtjR', '1JRxesv8EzjW-0IVyMvpvZZmvxFuNahm4', '1XY8vL-Dln1qnpf2qw7JbPIRy5RoYtYro', '1_A7YeGr1no2zyHfpsNI4YZwpOPTIGOMq', '1sCFUPYBBkP5OVH_szJ4U7GfEu3Z7FL0M', '1JjUqJv95M-3hgEMXXQl6MkKx3zKs6Qdy', '1sjrgSVhEajTk1HtaUzDh3GdiMiTilGdV', '1nDWggzDLWphHxIhEmIqpmUTWwP3NvziS', '1FsO9fLBIGUIYEjqSvJaZRPYbUF5gd6-9', '1HPv9YJ8XPewgUs2F1RtguZFIHpwURBSu', '1Cl4xsL-2kFf9nmZGXDluD1d3fdIm-XDd', '1FNeDeoX2JUvvg5AJebnALBWZQpoL-t8P', '1zH0HzOJEh7vW0lIKIgOqrQS2XprDl5mQ', '1EynaF9VI5s1WRBlOPpUI2a9AmmF02JVb', '1UO_PsgdyhrvJtaNAZrVqFbe8sqJpowtb', '16EqE3hMpnxmeBrIWdp9JF8seCjJZDdpZ', '1NcJh3ma-mVz371yJqMZ_sqMe5AcvksTz', '1SjGB71se0AlPIWu6fQSlJ8YuBh8fG7WO', '1X03AWiGwg1Od0iPiMrirUnXw_aEgI2Oi', '1IBCfkYu6isBGJnJUameexpa8SoJkfcdq', '1Ipia4BCeKQRzQOOFnSTm7VdVt_guuFik', '1iD6OjJEU07viselkCFwwG87Yob6VXmPt', '12n_xB9cbPcd-5JZQKkuLtNAOMQCtJPNd', '1Sq0RepGztSzg2P2s1nlTEECRMN_ec8KO', '1WCFY4VShyE67uXKYFvVNvSoFw83lOEdI', '15DeOwvZtEMSgqDpg75h5z6prPQir2M7D', '1gyv9Ld4PBXiFUjoh4qJ11v6mIDyVzn2a', '15gFWziyMUkoy78Hclw3i21JoCVguSCvl', '1x1trL-eZZKsn2BGHXX5wnJuuNSo1crVo', '1Hdpmf1BguzOtvxKaAllE0rEAzgT1qmks', '1E4NBFDIcaLORfiUFr8HhUWrwYaR1a64-', '1J5jtIu6AaOM8NTM8DZSJeOfxCKCgx5P2', '1WcJv-e2oQJrAdczLHjWvNaWW3tNhU6jg', '1nbwiyBbjb_oQaZc-nKxwc0GsxymuvzM-', '1SaYPbB8LIPxrvpEvwL3VaBOaZ5iier6K', '15iBktDNscX679Nf1T4vwSELFfbFOUNO_', '1uQ4HQ_fX9jpmhGnqqyfymEpUi3NSL8lX', '14g3zEvtqil02ptw0V1DCaiS1xfyehmKQ', '1w3pC_lI7vkqqFGUc8svDvVS9HXn-YnjC', '1RiAqkAOqvgaxdNvoziqQIY5inzYojGmS', '1DL2dFmnk_lFKND0n5Ox1Iun8Fq3RxYA4', '1FBy6QPDZWN61OHR5ozZG_dendeptPHYY'];
 
-    /* ══ MUSIC ══ */
-    let musicOn = false, audioPlayer = null;
+    /* ══ MUSIC — Web Audio API (paling reliable, bypass autoplay policy) ══ */
+    let musicOn = false;
     const mBtn = document.getElementById('mbtn');
+
+    // Daftar sumber musik — GitHub Pages raw langsung
+    const MUSIC_SRCS = [
+      'Hadirmu.mp3',                                                                   // Relative path (GitHub Pages)
+      'https://raw.githubusercontent.com/ryantrisyardi-glitch/BerbulanBulan-AkuRahasiakanIni/main/Hadirmu.mp3'
+    ];
+
+    let audioCtx = null;
+    let gainNode = null;
+    let audioBuffer = null;
+    let audioSource = null;
+    let audioLoaded = false;
+    let audioLoading = false;
+    let audioPaused = false;
+    let pauseOffset = 0;
+    let startTime = 0;
+
+    async function loadAudio() {
+      if (audioLoaded || audioLoading) return;
+      audioLoading = true;
+      mBtn.textContent = '…';
+
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        gainNode = audioCtx.createGain();
+        gainNode.gain.value = 0.45;
+        gainNode.connect(audioCtx.destination);
+      }
+
+      for (let src of MUSIC_SRCS) {
+        try {
+          const resp = await fetch(src);
+          if (!resp.ok) continue;
+          const arrayBuffer = await resp.arrayBuffer();
+          audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+          audioLoaded = true;
+          console.log('Audio loaded from:', src);
+          break;
+        } catch(e) {
+          console.log('Audio source failed:', src, e);
+        }
+      }
+
+      audioLoading = false;
+      if (!audioLoaded) {
+        mBtn.textContent = '✕';
+        console.log('All audio sources failed');
+        return;
+      }
+    }
+
+    function playAudioBuffer() {
+      if (!audioLoaded || !audioBuffer || !audioCtx) return;
+      if (audioSource) { try { audioSource.stop(); } catch(e) {} }
+      audioSource = audioCtx.createBufferSource();
+      audioSource.buffer = audioBuffer;
+      audioSource.loop = true;
+      audioSource.connect(gainNode);
+      audioSource.start(0, pauseOffset % audioBuffer.duration);
+      startTime = audioCtx.currentTime - (pauseOffset % audioBuffer.duration);
+      musicOn = true;
+      audioPaused = false;
+      mBtn.textContent = '♫';
+      mBtn.classList.add('on');
+    }
+
+    async function startMusic() {
+      // Resume AudioContext if suspended (required by Chrome autoplay policy)
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        gainNode = audioCtx.createGain();
+        gainNode.gain.value = 0.45;
+        gainNode.connect(audioCtx.destination);
+      }
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+      if (!audioLoaded) {
+        await loadAudio();
+      }
+
+      if (audioLoaded) {
+        playAudioBuffer();
+      }
+    }
+
+    function toggleMusic() {
+      if (musicOn) {
+        // Pause
+        pauseOffset = audioCtx ? (audioCtx.currentTime - startTime) : 0;
+        if (audioSource) { try { audioSource.stop(); } catch(e) {} }
+        musicOn = false;
+        audioPaused = true;
+        mBtn.textContent = '♪';
+        mBtn.classList.remove('on');
+      } else {
+        startMusic();
+      }
+    }
+
+    // Preload audio in background after page load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          gainNode = audioCtx.createGain();
+          gainNode.gain.value = 0.45;
+          gainNode.connect(audioCtx.destination);
+        }
+        loadAudio();
+      }, 2000);
+    });
 
     /* — Star particles in background — */
     (function () {
@@ -1977,39 +2088,6 @@
         }, 1800);
 
       }, 350);
-    }
-
-    /* — Music: play direct Google Drive link inside user gesture — */
-    function startMusic() {
-      musicOn = true;
-      mBtn.textContent = '♫';
-      mBtn.classList.add('on');
-
-      if (!audioPlayer) {
-        audioPlayer = new Audio();
-        audioPlayer.src = 'Hadirmu.mp3';
-        audioPlayer.loop = true;
-        audioPlayer.volume = 0.45;
-
-        audioPlayer.addEventListener('error', function(e) {
-          console.log("Audio gagal dimuat:", e);
-        });
-      }
-
-      audioPlayer.play().catch(err => {
-        console.log("Audio play failed or autoplay blocked:", err);
-      });
-    }
-
-    function toggleMusic() {
-      if (musicOn) {
-        if (audioPlayer) audioPlayer.pause();
-        musicOn = false;
-        mBtn.textContent = '♪';
-        mBtn.classList.remove('on');
-      } else {
-        startMusic();
-      }
     }
 
     /* — Canvas confetti burst — */
@@ -2403,16 +2481,21 @@
       if (!c) return;
       const ctx = c.getContext('2d');
       let drops = [];
-      function resize() { c.width = c.offsetWidth || innerWidth; c.height = c.offsetHeight || innerHeight; }
+      function resize() {
+        c.width = innerWidth;
+        c.height = innerHeight;
+        // Re-init drops after resize so they spread across new size
+        drops = [];
+        for (let i = 0; i < density; i++) {
+          drops.push({
+            x: Math.random() * c.width, y: Math.random() * c.height,
+            len: 8 + Math.random() * 14, spd: 6 + Math.random() * 10,
+            op: 0.08 + Math.random() * 0.25, w: 0.5 + Math.random() * 0.5
+          });
+        }
+      }
       resize();
       window.addEventListener('resize', resize);
-      for (let i = 0; i < density; i++) {
-        drops.push({
-          x: Math.random() * c.width, y: Math.random() * c.height,
-          len: 8 + Math.random() * 14, spd: 6 + Math.random() * 10,
-          op: 0.08 + Math.random() * 0.25, w: 0.5 + Math.random() * 0.5
-        });
-      }
       function frame() {
         ctx.clearRect(0, 0, c.width, c.height);
         drops.forEach(d => {
