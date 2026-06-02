@@ -1987,18 +1987,12 @@
 
       if (!audioPlayer) {
         audioPlayer = new Audio();
-        // Use usercontent link as primary source (bypasses Google redirect page and cookie warnings)
-        audioPlayer.src = 'https://drive.usercontent.google.com/download?id=15pjLwGwJl3e64ZmEIWLxe71TF0HnC8yX&export=download&confirm=t';
+        audioPlayer.src = 'Hadirmu.mp3';
         audioPlayer.loop = true;
         audioPlayer.volume = 0.45;
-        
-        // Failsafe error handling
+
         audioPlayer.addEventListener('error', function(e) {
-          console.log("Primary Audio source failed, trying fallback...", e);
-          if (audioPlayer.src.indexOf('usercontent') !== -1) {
-            audioPlayer.src = 'https://docs.google.com/uc?export=download&id=15pjLwGwJl3e64ZmEIWLxe71TF0HnC8yX';
-            audioPlayer.play().catch(err => console.log("Fallback audio play failed too:", err));
-          }
+          console.log("Audio gagal dimuat:", e);
         });
       }
 
