@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>Untuk Yang Tersayang</title>
   <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel+Decorative:wght@400;700&family=Great+Vibes&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel+Decorative:wght@400;700&family=Great+Vibes&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Playwrite+GB+J:wght@100..400&display=swap"
     rel="stylesheet">
   <style>
     *,
@@ -432,6 +432,55 @@
       }
     }
 
+    .s1-info-text {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 12;
+      text-align: center;
+      width: 90%;
+      max-width: 480px;
+      pointer-events: none;
+      opacity: 0;
+      animation: s1TextFade 1.5s 3.5s forwards, s1TextFloat 4s ease-in-out infinite;
+    }
+
+    .s1-info-text h2 {
+      font-family: 'Playwrite GB J', cursive;
+      font-size: clamp(16px, 5vw, 24px);
+      color: #e8c870;
+      text-shadow: 0 0 20px rgba(232, 200, 112, 0.4), 0 2px 6px rgba(0, 0, 0, 0.6);
+      margin-bottom: 14px;
+    }
+
+    .s1-info-text p {
+      font-family: 'Playwrite GB J', cursive;
+      font-size: clamp(11.5px, 3.2vw, 14px);
+      color: rgba(240, 234, 220, 0.85);
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+      letter-spacing: 0.05em;
+      line-height: 1.8;
+    }
+
+    @keyframes s1TextFade {
+      to {
+        opacity: 1
+      }
+    }
+
+    @keyframes s1TextFloat {
+
+      0%,
+      100% {
+        transform: translate(-50%, -52%);
+      }
+
+      50% {
+        transform: translate(-50%, -48%);
+      }
+    }
+
     /* ══ S2: PEMBUKA ══ */
     #s2 {
       position: relative;
@@ -501,11 +550,11 @@
     }
 
     .s2-sub {
-      font-size: 16px;
-      font-weight: 300;
-      font-style: italic;
-      color: rgba(200, 216, 240, .7);
-      letter-spacing: .1em
+      font-family: 'Playwrite GB J';
+      font-size: 14.5px;
+      font-weight: 400;
+      color: rgba(200, 216, 240, .8);
+      letter-spacing: .05em
     }
 
     /* ══ S3: SURAT ══ */
@@ -534,12 +583,12 @@
     }
 
     .lb p {
-      font-size: 17px;
-      font-weight: 300;
-      font-style: italic;
-      line-height: 2.1;
+      font-family: 'Playwrite GB J';
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.95;
       text-align: center;
-      color: rgba(240, 234, 220, .85)
+      color: rgba(240, 234, 220, .9);
     }
 
     .lb p strong {
@@ -789,12 +838,12 @@
     }
 
     .cv {
-      font-size: 16px;
-      font-weight: 300;
-      font-style: italic;
-      line-height: 2.1;
+      font-family: 'Playwrite GB J';
+      font-size: 14.5px;
+      font-weight: 400;
+      line-height: 1.9;
       text-align: center;
-      color: rgba(238, 228, 210, .8);
+      color: rgba(238, 228, 210, .9);
       margin-bottom: 22px
     }
 
@@ -808,12 +857,13 @@
     }
 
     .cdu {
-      font-size: 13px;
-      letter-spacing: .12em;
-      color: rgba(180, 200, 230, .5);
+      font-family: 'Playwrite GB J';
+      font-size: 12.5px;
+      letter-spacing: .06em;
+      color: rgba(180, 200, 230, .75);
       text-align: center;
       margin-bottom: 26px;
-      line-height: 1.9
+      line-height: 1.8
     }
 
     .gdiv {
@@ -1203,85 +1253,97 @@
     }
 
     /* Page inner styles */
-    .page-header {
-      font-size: 10px;
-      letter-spacing: .2em;
-      color: rgba(0, 0, 0, 0.45);
-      text-transform: uppercase;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    /* Page inner styles */
+    .book-page-container {
       width: 100%;
-      text-align: center;
-      padding-bottom: 4px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 20px;
+      box-sizing: border-box;
     }
 
-    .page-footer {
+    .book-page-header {
+      font-family: 'Playwrite GB J';
       font-size: 10px;
-      color: rgba(0, 0, 0, 0.35);
+      font-weight: 600;
+      letter-spacing: .15em;
+      color: #000000 !important;
+      text-transform: uppercase;
+      border-bottom: 1.5px solid rgba(0, 0, 0, 0.12);
+      width: 100%;
+      text-align: center;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+    }
+
+    .book-page-footer {
+      font-family: 'Playwrite GB J';
+      font-size: 10px;
+      font-weight: 500;
+      color: #000000 !important;
       width: 100%;
       display: flex;
       justify-content: space-between;
-      border-top: 1px solid rgba(0, 0, 0, 0.06);
-      padding-top: 4px;
+      border-top: 1.5px solid rgba(0, 0, 0, 0.12);
+      padding-top: 6px;
+      margin-top: 10px;
     }
 
     /* Polaroid Photo Frame inside album */
-    .photo-frame {
-      background: #fff;
-      padding: 10px 10px 18px 10px;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.05);
+    .book-photo-frame {
+      background: #ffffff;
+      padding: 6px 6px 12px 6px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       border: 1px solid rgba(0, 0, 0, 0.08);
-      width: 82%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: transform 0.3s ease;
-    }
-
-    .photo-frame img {
-      width: 100%;
-      aspect-ratio: 3/4;
-      object-fit: cover;
-      display: block;
-    }
-
-    /* Handmade captions */
-    .photo-caption {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 13.5px;
-      font-style: italic;
-      font-weight: 400;
-      color: #444;
-      text-align: center;
-      margin-top: 12px;
-      line-height: 1.45;
-      white-space: pre-line;
-      width: 100%;
-      padding: 0 4px;
-    }
-
-    /* Text pages (Intro and Outro inside the book) */
-    .page-text-content {
+      width: 95%;
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 80%;
+      overflow: hidden;
+    }
+
+    .book-photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 1px;
+    }
+
+    /* Text content inside book pages */
+    .book-text-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      width: 100%;
+      overflow: hidden;
       text-align: center;
-      padding: 0 10px;
+      padding: 0 4px;
     }
 
-    .page-text-content p {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 17px;
-      line-height: 1.8;
-      font-style: italic;
-      color: #2b2015;
+    .book-text-content p {
+      font-family: 'Playwrite GB J';
+      font-size: clamp(11.5px, 2.2vw, 13.5px);
+      line-height: 1.75;
+      font-weight: 400;
+      color: #000000 !important;
+      overflow-y: auto;
+      max-height: 100%;
+      margin: 0;
+      white-space: pre-line;
     }
 
-    .page-text-content .ornament {
-      font-size: 20px;
+    .book-text-content .ornament {
+      font-size: 18px;
       color: #d4af37;
-      margin: 15px 0;
+      margin: 8px 0;
     }
 
     /* Book Controls */
@@ -1692,6 +1754,10 @@
     <div class="glow-g"></div>
     <div class="scene-w" id="house1"></div>
     <div id="bokeh-w"></div>
+    <div class="s1-info-text">
+      <h2>Mari kita telusuri kisah ini…</h2>
+      <p>Gulir ke bawah perlahan untuk memulai perjalanan kita</p>
+    </div>
     <div class="scroll-hint"><span>scroll</span>
       <div class="arr"></div>
     </div>
@@ -1949,7 +2015,7 @@
           audioLoaded = true;
           console.log('Audio loaded from:', src);
           break;
-        } catch(e) {
+        } catch (e) {
           console.log('Audio source failed:', src, e);
         }
       }
@@ -1964,7 +2030,7 @@
 
     function playAudioBuffer() {
       if (!audioLoaded || !audioBuffer || !audioCtx) return;
-      if (audioSource) { try { audioSource.stop(); } catch(e) {} }
+      if (audioSource) { try { audioSource.stop(); } catch (e) { } }
       audioSource = audioCtx.createBufferSource();
       audioSource.buffer = audioBuffer;
       audioSource.loop = true;
@@ -2000,7 +2066,7 @@
       if (musicOn) {
         // Pause
         pauseOffset = audioCtx ? (audioCtx.currentTime - startTime) : 0;
-        if (audioSource) { try { audioSource.stop(); } catch(e) {} }
+        if (audioSource) { try { audioSource.stop(); } catch (e) { } }
         musicOn = false;
         audioPaused = true;
         mBtn.textContent = '♪';
@@ -2134,38 +2200,59 @@
 
     /* ══ 3D PHOTO ALBUM BOOK ══ */
     (function () {
+      // Photo pages (foto saja, tanpa caption)
       const PAGES = [
+        { era: 'Bayi', img: 'https://lh3.googleusercontent.com/d/1Bk3fK77sM0bTN0N67CfV6vWyNX4A46-U', shape: 'portrait' },
+        { era: 'SD — Masa Kecil', img: 'https://lh3.googleusercontent.com/d/1j26dEkmQdUq4P3Y5OObdZWJyi6tDjIZ2', shape: 'portrait' },
+        { era: 'SD — Masa Kecil', img: 'https://lh3.googleusercontent.com/d/1b3b_5a4qn35rHyXgeq1a7H12R6fg0HyR', shape: 'landscape' },
+        { era: 'SD — Masa Kecil', img: 'https://lh3.googleusercontent.com/d/1MJkoI68Q9aUTOCwt64WZ4dnVzFJpegyC', shape: 'portrait' },
+        { era: 'SMP — Mulai Tumbuh', img: 'https://lh3.googleusercontent.com/d/1WKuA-Sh8gSfZdz6oWYoKw6KoiH7nez_d', shape: 'landscape' },
+        { era: 'SMA — Masa Remaja', img: 'https://lh3.googleusercontent.com/d/1OhOtV4AM41kVl2dpy0aNLJT9qJyEoLrl', shape: 'portrait' },
+        { era: 'Kuliah — Menjadi Dewasa', img: 'https://lh3.googleusercontent.com/d/15mKHUwFlmcGcmEPPdlCtgZukPOLAXA_V', shape: 'square' },
+        { era: 'Menuju Hari Kita', img: 'https://lh3.googleusercontent.com/d/1xbbp-q-cpkzM4OO-MyKMU_uUW56Q19uP', shape: 'portrait' },
+      ];
+
+      // Caption pages (teks saja, terpisah dari foto)
+      const CAPTIONS = [
         {
-          era: 'Bayi', img: 'https://lh3.googleusercontent.com/d/1Bk3fK77sM0bTN0N67CfV6vWyNX4A46-U',
-          caption: 'Beginilah kamu di awal segalanya —\nkecil, bersih, dan penuh harapan.\nAllah titipkan kamu ke dunia ini\nuntuk menjadi cahaya.', shape: 'portrait'
+          era: 'Bayi',
+          header: '🌸 Awal Segalanya',
+          text: 'Beginilah kamu di awal segalanya — kecil, bersih, dan penuh harapan.<br><br>Allah titipkan kamu ke dunia ini bukan “kebetulan”.'
         },
         {
-          era: 'SD — Masa Kecil', img: 'https://lh3.googleusercontent.com/d/1j26dEkmQdUq4P3Y5OObdZWJyi6tDjIZ2',
-          caption: 'Tawa ceria masa kecil di sekolah dasar,\nlangkah polos penuh rasa ingin tahu.', shape: 'portrait'
+          era: 'SD — Masa Kecil',
+          header: '✏️ Tawa Ceria',
+          text: 'Tawa ceria masa kecil di sekolah dasar.<br><br>Langkah-langkah kecil dan polosmu dipenuhi rasa ingin tahu.'
         },
         {
-          era: 'SD — Masa Kecil', img: 'https://lh3.googleusercontent.com/d/1b3b_5a4qn35rHyXgeq1a7H12R6fg0HyR',
-          caption: 'Hari-hari yang diisi dengan bermain, belajar,\ndan tumbuh bersama teman-teman.', shape: 'landscape'
+          era: 'SD — Bersama Keluarga',
+          header: '🏠 Tumbuh Bersama',
+          text: 'Hari-harimu diisi dengan bermain, belajar, dan tumbuh bersama teman-teman dan bersama orang-orang yang mencintaimu.<br><br>Mamah dan abah menemani setiap prosesmu, menjadi tempat pulang yang selalu hangat.'
         },
         {
-          era: 'SD — Masa Kecil', img: 'https://lh3.googleusercontent.com/d/1MJkoI68Q9aUTOCwt64WZ4dnVzFJpegyC',
-          caption: 'Kasih sayang hangat dari ayah dan ibu\nyang membentuk pribadimu yang penuh kebaikan.', shape: 'portrait'
+          era: 'SD — Kasih Sayang',
+          header: '💛 Fondasi Cinta',
+          text: 'Kasih sayang mamah dan abah menjadi fondasi yang membentuk dirimu.<br><br>Dari mereka, kamu belajar banyak hal tentang kasih sayang, cinta, ketulusan, kebaikan dan kesabaran — tanpa kamu sadari.'
         },
         {
-          era: 'SMP — Mulai Tumbuh', img: 'https://lh3.googleusercontent.com/d/1WKuA-Sh8gSfZdz6oWYoKw6KoiH7nez_d',
-          caption: 'Memasuki masa remaja di SMP,\nmulai merangkai mimpi-mimpi indah untuk hari esok.', shape: 'landscape'
+          era: 'SMP — Mulai Tumbuh',
+          header: '🌱 Tumbuh & Kehilangan',
+          text: 'Memasuki masa remaja di SMP, mulai mengenal mimpi dan cita-cita.<br><br>Namun menjelang berakhirnya masa SMP dan memasuki SMA, mamah sudah waktunya pulang. Tak pernah disangka — pelukan hangat, tempat kasih sayang terbesar itu tak lagi bisa kamu rasakan seperti dulu dan tak bisa kembali.'
         },
         {
-          era: 'SMA — Masa Remaja', img: 'https://lh3.googleusercontent.com/d/1OhOtV4AM41kVl2dpy0aNLJT9qJyEoLrl',
-          caption: 'Masa-masa SMA yang indah,\nkepribadianmu tumbuh semakin anggun dan santun.', shape: 'portrait'
+          era: 'SMA — Masa Remaja',
+          header: '💪 Tetap Melangkah',
+          text: 'Masa-masa SMA yang berusaha kamu jalani seindah mungkin walau tanpa mamah, membentuk kepribadianmu tumbuh semakin kuat.<br><br>Meski ada ruang kosong yang tidak akan pernah tergantikan. Tapi abah dan kakakmu selalu ada untukmu.'
         },
         {
-          era: 'Kuliah — Menjadi Dewasa', img: 'https://lh3.googleusercontent.com/d/15mKHUwFlmcGcmEPPdlCtgZukPOLAXA_V',
-          caption: 'Menapaki kemandirian di bangku kuliah,\nbersiap menjadi wanita dewasa yang hebat.', shape: 'square'
+          era: 'Kuliah — Menjadi Dewasa',
+          header: '🎓 Semakin Kuat',
+          text: 'Menapaki kemandirian, bersiap menjadi wanita dewasa yang hebat.<br><br>Ujian kembali datang — disaat itupula kakakmu harus menyusul mamah. Dan saat itulah, tinggal berdua bersama abah membentukmu lebih hebat.<br><br>Kakakmu selalu hadir walau jauh. Rasa kasih sayang mereka sangat kuat tak tergambarkan.<br><br>Lalu, di titik inilah Allah pertemukan kita.'
         },
         {
-          era: 'Sebelum Kita Bertemu', img: 'https://lh3.googleusercontent.com/d/1xbbp-q-cpkzM4OO-MyKMU_uUW56Q19uP',
-          caption: 'Dan di sinilah perjalananmu\nbertemu dengan perjalananku.\nAllah yang menulis cerita ini\njauh sebelum kita menyadarinya.', shape: 'portrait'
+          era: 'Menuju Hari Kita',
+          header: '💍 Saat Kamu Hadir',
+          text: 'Lalu tibalah saat ketika aku hadir dalam hidupmu. Di sinilah aku hadir menggantikan semua peran — abah, mamah, kakak, sahabat-sahabatmu.<br><br>Aku tidak akan pernah bisa menggantikan mereka semua, tapi aku akan berusaha, namun maafkan aku yang belum sempurna menjadi mereka semua.<br><br>Dan di titik inilah, kamu juga ditakdirkan siap menjadi pemegang pintu surga untuk anak ku oleh Allah — menjadi seorang ibu.'
         },
       ];
 
@@ -2177,141 +2264,90 @@
 
       if (!book) return;
 
-      const totalSheets = 6;
-      totalSheetsEl.textContent = totalSheets;
+      const sheetsData = [];
 
-      const sheetsData = [
-        {
+      // Sheet 0: Cover (front) + Photo 1 (back)
+      sheetsData.push({
+        front: {
           type: 'cover',
-          front: {
-            isCover: true,
-            title: 'Potret Bidadari Titipan Allah',
-            subtitle: 'Yang tumbuh dalam kasih sayang ibu dan ayah, lalu Allah titipkan kepada seorang laki-laki yang tidak sempurna.',
-            badge: '🌹',
-            action: 'Ketuk untuk Membuka 📖'
-          },
-          back: {
-            isText: true,
-            header: 'Awal Perjalanan',
-            title: 'Awal Perjalanan',
-            content: 'Setiap kisah indah memiliki awal.<br><br>Lembaran ini merangkum langkah-langkah kehidupanmu, kenangan masa kecilmu, hingga takdir mempertemukan kita...',
-            footer: 'Lembar 1'
-          }
+          title: 'Potret Bidadari Titipan Allah',
+          subtitle: 'Yang tumbuh dalam kasih sayang mamah dan abah, lalu Allah titipkan kepada seorang laki-laki yang tidak sempurna.',
+          badge: '🌹',
+          action: 'Ketuk untuk Membuka 📖'
         },
-        {
-          type: 'photos',
-          front: PAGES[0], // Bayi
-          back: PAGES[1]   // SD 1
-        },
-        {
-          type: 'photos',
-          front: PAGES[2], // SD 2
-          back: PAGES[3]   // SD 3
-        },
-        {
-          type: 'photos',
-          front: PAGES[4], // SMP
-          back: PAGES[5]   // SMA
-        },
-        {
-          type: 'photos',
-          front: PAGES[6], // Kuliah
-          back: PAGES[7]   // Sebelum
-        },
-        {
-          type: 'outro',
-          front: {
-            isText: true,
-            header: 'Masa Depan',
-            title: 'Lembaran Baru',
-            content: 'Dan kini, kita bersiap menulis lembaran berikutnya bersama-sama.<br><br>Di jalan yang diridhai-Nya, menuju akhir yang abadi... 🤍',
-            footer: 'Lembar 10'
-          },
-          back: {
-            isBackCover: true
-          }
+        back: {
+          type: 'photo',
+          era: PAGES[0].era,
+          img: PAGES[0].img,
+          pageNum: 1
         }
-      ];
+      });
+
+      // Sheet 1 to PAGES.length - 1 (PAGES has 8 photos, so indices 1 to 7)
+      for (let i = 1; i < PAGES.length; i++) {
+        sheetsData.push({
+          front: {
+            type: 'caption',
+            header: CAPTIONS[i - 1].header,
+            text: CAPTIONS[i - 1].text,
+            pageNum: i * 2
+          },
+          back: {
+            type: 'photo',
+            era: PAGES[i].era,
+            img: PAGES[i].img,
+            pageNum: i * 2 + 1
+          }
+        });
+      }
+
+      // Sheet 8: Caption 8 (front) + Outro (back)
+      sheetsData.push({
+        front: {
+          type: 'caption',
+          header: CAPTIONS[7].header,
+          text: CAPTIONS[7].text,
+          pageNum: 16
+        },
+        back: {
+          type: 'outro',
+          header: '🤗 Untuk Selamanya',
+          content: 'Semua perjalanan ini bukan kebetulan. Kelahiranmu bukan tidak diinginkan atau direncanakan, tapi Allah sudah tuliskan jauh sebelum kita lahir bahwa kamu akan bersamaku pada akhirnya.<br><br>Abah tetap hadir sampai anak kita lahir, abah tidak mewakilkan pernikahanmu kepada siapa pun sehingga aku dapat berjabat tangan dengan abah saat ijab kabul, abah juga masih sempat mengasuh anak kita.<br><br>Saat ini, semua sudah abah ceritakan kepada mamah di taman surga-Nya Allah, dan mamah sama abah saat ini bangga sama kamu.<br><br>Kamu kuat, hebat, dan penuh cinta. Mereka menyaksikan bagaimana anak kecil yang dulu mereka besarkan telah tumbuh menjadi wanita yang kuat, hebat, dan penuh cinta.<br><br>Karena itu, teruslah melangkah. Jadilah wanita yang semakin shalihah, istri yang terbaik, dan ibu yang penuh kasih sayang.',
+          pageNum: 17
+        }
+      });
+
+      // Sheet 9: Back Cover (front) + Blank (back)
+      sheetsData.push({
+        front: {
+          type: 'back-cover',
+          title: 'Perjalanan Bidadari, Akan Terus Berlanjut',
+          badge: '💌'
+        },
+        back: {
+          type: 'blank'
+        }
+      });
+
+      // Set total sheets now that sheetsData is fully built
+      const totalSheets = sheetsData.length;
+      totalSheetsEl.textContent = totalSheets;
 
       // Render book sheets
       sheetsData.forEach((data, index) => {
         const paper = document.createElement('div');
         paper.className = 'paper';
         if (index === 0) paper.classList.add('cover-front');
-        if (index === totalSheets - 1) paper.classList.add('cover-back');
+        if (index === sheetsData.length - 1) paper.classList.add('cover-back');
 
-        // Create Front Face
         const frontFace = document.createElement('div');
         frontFace.className = 'front';
 
-        if (data.front && data.front.isCover) {
-          frontFace.innerHTML = `
-        <div class="cover-border"></div>
-        <div class="cover-content">
-          <div class="cover-badge">${data.front.badge}</div>
-          <h2 class="cover-title">${data.front.title}</h2>
-          <p class="cover-subtitle">${data.front.subtitle}</p>
-          <div class="cover-action">${data.front.action}</div>
-        </div>
-      `;
-        } else if (data.front && data.front.isText) {
-          frontFace.innerHTML = `
-        <div class="page-header">${data.front.header}</div>
-        <div class="page-text-content">
-          <div class="ornament">✦ 📖 ✦</div>
-          <p>${data.front.content}</p>
-          <div class="ornament">✦ ✦ ✦</div>
-        </div>
-        <div class="page-footer">
-          <span>&nbsp;</span>
-          <span>${data.front.footer}</span>
-        </div>
-      `;
-        } else if (data.front) {
-          const pageNum = index * 2;
-          const rot = (Math.random() * 4 - 2).toFixed(1);
-          frontFace.innerHTML = `
-        <div class="page-header">${data.front.era}</div>
-        <div class="photo-frame ${data.front.shape}" style="--rotation: ${rot}deg">
-          <img src="${data.front.img}" alt="${data.front.era}" loading="lazy">
-        </div>
-        <p class="photo-caption">${data.front.caption.replace(/\n/g, '<br>')}</p>
-        <div class="page-footer">
-          <span>&nbsp;</span>
-          <span>Halaman ${pageNum}</span>
-        </div>
-      `;
-        }
-
-        // Create Back Face
         const backFace = document.createElement('div');
         backFace.className = 'back';
 
-        if (data.back && data.back.isBackCover) {
-          backFace.innerHTML = `
-        <div class="cover-border"></div>
-        <div class="cover-content">
-          <div class="cover-badge">💌</div>
-          <h2 class="cover-title" style="font-size: 16px; color: rgba(220,190,110,0.6)">Perjalanan Bidadari, Akan Terus Berlanjut</h2>
-        </div>
-      `;
-        } else if (data.back && data.back.isText) {
-          backFace.innerHTML = `<div>Outro Back</div>`;
-        } else if (data.back) {
-          const pageNum = index * 2 + 1;
-          const rot = (Math.random() * 4 - 2).toFixed(1);
-          backFace.innerHTML = `
-        <div class="page-header">${data.back.era}</div>
-        <div class="photo-frame ${data.back.shape}" style="--rotation: ${rot}deg">
-          <img src="${data.back.img}" alt="${data.back.era}" loading="lazy">
-        </div>
-        <p class="photo-caption">${data.back.caption.replace(/\n/g, '<br>')}</p>
-        <div class="page-footer">
-          <span>Halaman ${pageNum}</span>
-          <span>&nbsp;</span>
-        </div>
-      `;
-        }
+        renderFace(frontFace, data.front);
+        renderFace(backFace, data.back);
 
         paper.appendChild(frontFace);
         paper.appendChild(backFace);
@@ -2327,6 +2363,72 @@
         book.appendChild(paper);
       });
 
+      function renderFace(faceElement, faceData) {
+        if (!faceData) return;
+
+        if (faceData.type === 'cover') {
+          faceElement.innerHTML = `
+            <div class="cover-border"></div>
+            <div class="cover-content">
+              <div class="cover-badge">${faceData.badge}</div>
+              <h2 class="cover-title">${faceData.title}</h2>
+              <p class="cover-subtitle">${faceData.subtitle}</p>
+              <div class="cover-action">${faceData.action}</div>
+            </div>`;
+        } else if (faceData.type === 'photo') {
+          faceElement.style.padding = '0';
+          faceElement.style.background = '#fdfaf2';
+          faceElement.innerHTML = `
+            <div class="book-page-container photo-page">
+              <div class="book-page-header">${faceData.era}</div>
+              <div class="book-photo-frame">
+                <img src="${faceData.img}" alt="${faceData.era}" loading="lazy">
+              </div>
+              <div class="book-page-footer">
+                <span>🌹</span>
+                <span>Halaman ${faceData.pageNum}</span>
+              </div>
+            </div>`;
+        } else if (faceData.type === 'caption') {
+          faceElement.style.padding = '0';
+          faceElement.style.background = '#fffef9';
+          faceElement.innerHTML = `
+            <div class="book-page-container caption-page">
+              <div class="book-page-header">${faceData.header}</div>
+              <div class="book-text-content">
+                <p>${faceData.text}</p>
+              </div>
+              <div class="book-page-footer">
+                <span>Halaman ${faceData.pageNum}</span>
+                <span>🌹</span>
+              </div>
+            </div>`;
+        } else if (faceData.type === 'outro') {
+          faceElement.style.padding = '0';
+          faceElement.style.background = '#fdfaf2';
+          faceElement.innerHTML = `
+            <div class="book-page-container outro-page">
+              <div class="book-page-header">${faceData.header}</div>
+              <div class="book-text-content">
+                <p>${faceData.content}</p>
+              </div>
+              <div class="book-page-footer">
+                <span>Halaman ${faceData.pageNum}</span>
+                <span>🤍</span>
+              </div>
+            </div>`;
+        } else if (faceData.type === 'back-cover') {
+          faceElement.innerHTML = `
+            <div class="cover-border"></div>
+            <div class="cover-content">
+              <div class="cover-badge">${faceData.badge}</div>
+              <h2 class="cover-title" style="font-size:16px; color:rgba(220,190,110,0.65)">${faceData.title}</h2>
+            </div>`;
+        } else {
+          faceElement.innerHTML = `<div style="width:100%;height:100%;background:transparent"></div>`;
+        }
+      }
+
       const papers = book.querySelectorAll('.paper');
       let curState = 0;
       let bookCompleted = false;
@@ -2335,16 +2437,16 @@
       function finishBookAndStartGlitch() {
         bookCompleted = true;
         document.body.classList.remove('locked-scroll'); // Unlock scroll for transition
-        
+
         setTimeout(() => {
           const s4 = document.getElementById('s4');
           if (!s4) return;
           s4.style.display = 'flex';
-          
+
           // Scroll smoothly to s4
           const targetY = s4.offsetTop;
           window.scrollTo({ top: targetY, behavior: 'smooth' });
-          
+
           // Lock scroll during glitch
           setTimeout(() => {
             document.body.classList.add('locked-scroll');
@@ -2446,7 +2548,7 @@
         entries.forEach(e => {
           if (e.isIntersecting && !bookCompleted && !bookLockTriggered) {
             bookLockTriggered = true;
-            
+
             document.querySelectorAll('.album-title,.album-subtitle').forEach(el => el.classList.add('on'));
             updateBook();
             resizeBook();
@@ -2459,7 +2561,7 @@
             // Lock scroll after centering completes
             setTimeout(() => {
               document.body.classList.add('locked-scroll');
-              
+
               // Cinematic opening
               setTimeout(() => {
                 if (curState === 0) {
@@ -2467,7 +2569,7 @@
                 }
               }, 400);
             }, 800);
-            
+
             albumIO.disconnect();
           }
         });
@@ -2616,28 +2718,15 @@
       window.prevSlide = () => goSlide(cur - 1);
       window.nextSlide = () => goSlide(cur + 1);
 
-      // Reveal + auto-center (soft, tidak lock scroll)
-      let s5Centered = false;
+      // Reveal gal-title hanya setelah glitch selesai (_galRevealReady di-set oleh runGlitch)
+      window._galRevealReady = false;
       const galIO = new IntersectionObserver(entries => {
         entries.forEach(e => {
-          if (e.isIntersecting) {
+          if (e.isIntersecting && window._galRevealReady) {
             e.target.classList.add('on');
-            // Auto-center s5 when first revealed (only once, softly)
-            if (!s5Centered) {
-              s5Centered = true;
-              const s5 = document.getElementById('s5');
-              if (s5) {
-                const s5top = s5.getBoundingClientRect().top + window.scrollY;
-                const targetY = s5top - Math.max(0, (innerHeight - s5.offsetHeight) / 2);
-                // Only scroll if s5 is more than 1/3 viewport below
-                if (s5.getBoundingClientRect().top > innerHeight * 0.35) {
-                  window.scrollTo({ top: targetY, behavior: 'smooth' });
-                }
-              }
-            }
           }
         });
-      }, { threshold: 0.25 });
+      }, { threshold: 0.15 });
       document.querySelectorAll('.gal-title').forEach(el => galIO.observe(el));
     })();
 
@@ -2660,7 +2749,7 @@
       }
       preloadGlitchImages();
 
-      runGlitch = function() {
+      runGlitch = function () {
         const canvas = document.getElementById('glitch-canvas');
         const veil = document.getElementById('glitch-veil');
         const label = document.getElementById('glitch-label');
@@ -2750,6 +2839,10 @@
             setTimeout(() => {
               s4.style.display = 'none';
               document.body.classList.remove('locked-scroll');
+              // Buka akses galeri dan scroll ke s5
+              window._galRevealReady = true;
+              // Trigger reveal manual untuk gal-title yang sudah in-viewport
+              document.querySelectorAll('.gal-title').forEach(el => el.classList.add('on'));
               // Auto-scroll to s5 center
               const s5 = document.getElementById('s5');
               if (s5) {
