@@ -1074,8 +1074,8 @@
     }
 
     .book-viewport {
-      width: 620px;
-      height: 420px;
+      width: 600px;
+      height: 460px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -1088,7 +1088,7 @@
       position: relative;
       width: 300px;
       /* Width of one page */
-      height: 400px;
+      height: 440px;
       transform-style: preserve-3d;
       transition: transform 1.2s cubic-bezier(0.2, 1, 0.2, 1);
       will-change: transform;
@@ -1217,7 +1217,7 @@
 
     .cover-title {
       font-family: 'Playfair Display', serif;
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 600;
       line-height: 1.4;
       color: #e8c870;
@@ -1228,7 +1228,7 @@
 
     .cover-subtitle {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 13px;
+      font-size: 14.5px;
       font-style: italic;
       line-height: 1.6;
       color: rgba(240, 230, 210, 0.85);
@@ -1237,14 +1237,14 @@
     }
 
     .cover-badge {
-      font-size: 16px;
+      font-size: 18px;
       color: #ffe060;
       margin-bottom: 8px;
       animation: hB 2.5s ease-in-out infinite;
     }
 
     .cover-action {
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: .2em;
       color: rgba(220, 190, 110, 0.6);
       text-transform: uppercase;
@@ -1261,13 +1261,13 @@
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
-      padding: 24px 20px;
+      padding: 22px 18px;
       box-sizing: border-box;
     }
 
     .book-page-header {
       font-family: 'Playwrite GB J';
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 600;
       letter-spacing: .15em;
       color: #000000 !important;
@@ -1281,7 +1281,7 @@
 
     .book-page-footer {
       font-family: 'Playwrite GB J';
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 500;
       color: #000000 !important;
       width: 100%;
@@ -1330,8 +1330,8 @@
 
     .book-text-content p {
       font-family: 'Playwrite GB J';
-      font-size: clamp(11.5px, 2.2vw, 13.5px);
-      line-height: 1.75;
+      font-size: clamp(12.5px, 2.4vw, 14.5px);
+      line-height: 1.8;
       font-weight: 400;
       color: #000000 !important;
       overflow-y: auto;
@@ -2312,7 +2312,7 @@
         back: {
           type: 'outro',
           header: '🤗 Untuk Selamanya',
-          content: 'Semua perjalanan ini bukan kebetulan. Kelahiranmu bukan tidak diinginkan atau direncanakan, tapi Allah sudah tuliskan jauh sebelum kita lahir bahwa kamu akan bersamaku pada akhirnya.<br><br>Abah tetap hadir sampai anak kita lahir, abah tidak mewakilkan pernikahanmu kepada siapa pun sehingga aku dapat berjabat tangan dengan abah saat ijab kabul, abah juga masih sempat mengasuh anak kita.<br><br>Saat ini, semua sudah abah ceritakan kepada mamah di taman surga-Nya Allah, dan mamah sama abah saat ini bangga sama kamu.<br><br>Kamu kuat, hebat, dan penuh cinta. Mereka menyaksikan bagaimana anak kecil yang dulu mereka besarkan telah tumbuh menjadi wanita yang kuat, hebat, dan penuh cinta.<br><br>Karena itu, teruslah melangkah. Jadilah wanita yang semakin shalihah, istri yang terbaik, dan ibu yang penuh kasih sayang.',
+          content: 'Semua perjalanan ini bukan kebetulan. Kelahiranmu bukan tidak diinginkan atau direncanakan, tapi Allah sudah tuliskan jauh sebelum kita lahir bahwa kamu akan bersamaku pada akhirnya.<br><br>abah tetap hadir sampai anak kita lahir, abah tidak mewakilkan pernikahanmu kepada siapa pun sehingga aku dapat berjabat tangan dengan abah saat ijab kabul, abah juga masih sempat mengasuh anak kita.<br><br>Saat ini, semua sudah abah ceritakan kepada mamah di taman surga-Nya Allah, dan mamah sama abah saat ini bangga sama kamu.<br><br>Kamu kuat, hebat, dan penuh cinta. Mereka menyaksikan bagaimana anak kecil yang dulu mereka besarkan telah tumbuh menjadi wanita yang kuat, hebat, dan penuh cinta.<br><br>Karena itu, teruslah melangkah. Jadilah wanita yang semakin shalihah, istri yang terbaik, dan ibu yang penuh kasih sayang.',
           pageNum: 17
         }
       });
@@ -2482,11 +2482,11 @@
 
         // Shift book container dynamically to center it
         if (curState === 0) {
-          book.style.transform = "translateX(-150px)";
+          book.style.transform = "translateX(0px)";
         } else if (curState === totalSheets) {
-          book.style.transform = "translateX(150px)";
+          book.style.transform = "translateX(300px)";
         } else {
-          book.style.transform = "translateX(0)";
+          book.style.transform = "translateX(150px)";
         }
       }
 
@@ -2536,7 +2536,7 @@
         const viewport = document.querySelector('.book-viewport');
         if (!wrapper || !viewport) return;
         const w = wrapper.offsetWidth;
-        const scale = Math.min(1, (w - 20) / 640);
+        const scale = Math.min(1.2, (w - 10) / 600);
         viewport.style.transform = `scale(${scale})`;
       }
 
@@ -2933,7 +2933,7 @@
           requestAnimationFrame(fwFrame);
         }
         fwFrame();
-        setTimeout(() => clearInterval(fwTimer), 12000);
+        // Fireworks run continuously without stopping (removed clearInterval timeout)
       }
     })();
 
