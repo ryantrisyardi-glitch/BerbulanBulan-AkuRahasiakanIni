@@ -1927,8 +1927,8 @@
       <p class="cv" style="font-size:14px;margin-top:8px">Pulang ke Rumah saat Adam dan Hawa tercipta —<br>Rumah yang
         Allah janjikan untuk disinggahi selamanya.<br>Dan aku ingin rumah itu adalah rumah <em>kita</em>.</p>
       <div class="gdiv" style="margin-top:22px"></div>
-      <p class="csig">— Dengan sepenuh cinta</p>
-      <p class="cdat" style="margin-top:6px">Aamiin ya Rabbal Alamin &nbsp;🤲</p>
+      <p class="csig">Aamiin ya Rabbal Alamin 🤲 </p>
+      <p class="cdat" style="margin-top:6px">Dengan sepenuh cinta &nbsp;🤍</p>
     </div>
   </section>
 
@@ -1978,13 +1978,21 @@
     let musicOn = false;
     const mBtn = document.getElementById('mbtn');
 
-    // Daftar sumber musik — GitHub Pages raw langsung
+    // Daftar sumber musik — Hadirmu (musik utama)
     const MUSIC_SRCS = [
-      'Hadirmu.mp3',                                                                   // Relative path (GitHub Pages)
+      'Hadirmu.mp3',
       'https://raw.githubusercontent.com/ryantrisyardi-glitch/BerbulanBulan-AkuRahasiakanIni/main/Hadirmu.mp3'
     ];
 
+    // Daftar sumber musik album
+    const ALBUM_MUSIC_SRCS = [
+      'MusikAlbum.mp3',
+      'https://raw.githubusercontent.com/ryantrisyardi-glitch/BerbulanBulan-AkuRahasiakanIni/main/MusikAlbum.mp3'
+    ];
+
     let audioCtx = null;
+
+    // — Hadirmu track —
     let gainNode = null;
     let audioBuffer = null;
     let audioSource = null;
@@ -1994,17 +2002,31 @@
     let pauseOffset = 0;
     let startTime = 0;
 
-    async function loadAudio() {
-      if (audioLoaded || audioLoading) return;
-      audioLoading = true;
-      mBtn.textContent = '…';
+    // — MusikAlbum track —
+    let albumGainNode = null;
+    let albumBuffer = null;
+    let albumSource = null;
+    let albumLoaded = false;
+    let albumLoading = false;
+    let albumPlaying = false;
 
+    function ensureAudioCtx() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         gainNode = audioCtx.createGain();
         gainNode.gain.value = 0.45;
         gainNode.connect(audioCtx.destination);
+        albumGainNode = audioCtx.createGain();
+        albumGainNode.gain.value = 0.45;
+        albumGainNode.connect(audioCtx.destination);
       }
+    }
+
+    async function loadAudio() {
+      if (audioLoaded || audioLoading) return;
+      audioLoading = true;
+      mBtn.textContent = '…';
+      ensureAudioCtx();
 
       for (let src of MUSIC_SRCS) {
         try {
@@ -2013,19 +2035,41 @@
           const arrayBuffer = await resp.arrayBuffer();
           audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
           audioLoaded = true;
-          console.log('Audio loaded from:', src);
+          console.log('Hadirmu loaded from:', src);
           break;
         } catch (e) {
-          console.log('Audio source failed:', src, e);
+          console.log('Hadirmu source failed:', src, e);
         }
       }
 
       audioLoading = false;
       if (!audioLoaded) {
         mBtn.textContent = '✕';
-        console.log('All audio sources failed');
+        console.log('All Hadirmu sources failed');
         return;
       }
+    }
+
+    async function loadAlbumAudio() {
+      if (albumLoaded || albumLoading) return;
+      albumLoading = true;
+      ensureAudioCtx();
+
+      for (let src of ALBUM_MUSIC_SRCS) {
+        try {
+          const resp = await fetch(src);
+          if (!resp.ok) continue;
+          const arrayBuffer = await resp.arrayBuffer();
+          albumBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+          albumLoaded = true;
+          console.log('MusikAlbum loaded from:', src);
+          break;
+        } catch (e) {
+          console.log('MusikAlbum source failed:', src, e);
+        }
+      }
+
+      albumLoading = false;
     }
 
     function playAudioBuffer() {
@@ -2044,27 +2088,16 @@
     }
 
     async function startMusic() {
-      // Resume AudioContext if suspended (required by Chrome autoplay policy)
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        gainNode = audioCtx.createGain();
-        gainNode.gain.value = 0.45;
-        gainNode.connect(audioCtx.destination);
-      }
+      ensureAudioCtx();
       if (audioCtx.state === 'suspended') await audioCtx.resume();
-
-      if (!audioLoaded) {
-        await loadAudio();
-      }
-
-      if (audioLoaded) {
-        playAudioBuffer();
-      }
+      if (!audioLoaded) await loadAudio();
+      if (audioLoaded) playAudioBuffer();
+      // Preload album music in background
+      loadAlbumAudio();
     }
 
     function toggleMusic() {
       if (musicOn) {
-        // Pause
         pauseOffset = audioCtx ? (audioCtx.currentTime - startTime) : 0;
         if (audioSource) { try { audioSource.stop(); } catch (e) { } }
         musicOn = false;
@@ -2076,15 +2109,53 @@
       }
     }
 
+    // Mute Hadirmu dan play MusikAlbum saat album foto dibuka
+    async function startAlbumMusic() {
+      if (!audioCtx) return;
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+      // Mute Hadirmu (tidak di-stop, hanya di-mute)
+      if (gainNode) gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5);
+
+      // Load album music jika belum
+      if (!albumLoaded) await loadAlbumAudio();
+
+      if (!albumLoaded || !albumBuffer) return;
+
+      // Stop jika sebelumnya ada yang berjalan
+      if (albumSource) { try { albumSource.stop(); } catch (e) { } }
+
+      albumSource = audioCtx.createBufferSource();
+      albumSource.buffer = albumBuffer;
+      albumSource.loop = true;
+      albumSource.connect(albumGainNode);
+      albumGainNode.gain.setTargetAtTime(0.45, audioCtx.currentTime, 0.5);
+      albumSource.start(0);
+      albumPlaying = true;
+      console.log('MusikAlbum playing');
+    }
+
+    // Stop MusikAlbum dan unmute Hadirmu saat album ditutup
+    function stopAlbumMusic() {
+      // Fade out album music
+      if (albumGainNode && audioCtx) {
+        albumGainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.8);
+        setTimeout(() => {
+          if (albumSource) { try { albumSource.stop(); } catch (e) { } albumSource = null; }
+          albumPlaying = false;
+        }, 2000);
+      }
+
+      // Unmute Hadirmu (fade in kembali) — hanya jika sedang playing
+      if (gainNode && audioCtx && musicOn) {
+        gainNode.gain.setTargetAtTime(0.45, audioCtx.currentTime, 0.8);
+      }
+    }
+
     // Preload audio in background after page load
     window.addEventListener('load', () => {
       setTimeout(() => {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-          gainNode = audioCtx.createGain();
-          gainNode.gain.value = 0.45;
-          gainNode.connect(audioCtx.destination);
-        }
+        ensureAudioCtx();
         loadAudio();
       }, 2000);
     });
@@ -2312,7 +2383,7 @@
         back: {
           type: 'outro',
           header: '🤗 Untuk Selamanya',
-          content: 'Semua perjalanan ini bukan kebetulan. Kelahiranmu bukan tidak diinginkan atau direncanakan, tapi Allah sudah tuliskan jauh sebelum kita lahir bahwa kamu akan bersamaku pada akhirnya.<br><br>abah tetap hadir sampai anak kita lahir, abah tidak mewakilkan pernikahanmu kepada siapa pun sehingga aku dapat berjabat tangan dengan abah saat ijab kabul, abah juga masih sempat mengasuh anak kita.<br><br>Saat ini, semua sudah abah ceritakan kepada mamah di taman surga-Nya Allah, dan mamah sama abah saat ini bangga sama kamu.<br><br>Kamu kuat, hebat, dan penuh cinta. Mereka menyaksikan bagaimana anak kecil yang dulu mereka besarkan telah tumbuh menjadi wanita yang kuat, hebat, dan penuh cinta.<br><br>Karena itu, teruslah melangkah. Jadilah wanita yang semakin shalihah, istri yang terbaik, dan ibu yang penuh kasih sayang.',
+          content: 'Semua perjalanan ini bukan kebetulan. Kelahiranmu bukan tidak diinginkan atau direncanakan, tapi Allah sudah tuliskan jauh sebelum kita lahir bahwa kamu akan bersamaku pada akhirnya.<br><br>Abah tetap hadir sampai anak kita lahir, abah tidak mewakilkan pernikahanmu kepada siapa pun sehingga aku dapat berjabat tangan dengan abah saat ijab kabul, abah juga masih sempat mengasuh anak kita.<br><br>Saat ini, semua sudah abah ceritakan kepada mamah di taman surga-Nya Allah, dan mamah sama abah saat ini bangga sama kamu.<br><br>Kamu kuat, hebat, dan penuh cinta. Mereka menyaksikan bagaimana anak kecil yang dulu mereka besarkan telah tumbuh menjadi wanita yang kuat, hebat, dan penuh cinta.<br><br>Karena itu, teruslah melangkah. Jadilah wanita yang semakin shalihah, istri yang terbaik, dan ibu yang penuh kasih sayang.',
           pageNum: 17
         }
       });
@@ -2438,6 +2509,9 @@
         bookCompleted = true;
         document.body.classList.remove('locked-scroll'); // Unlock scroll for transition
 
+        // Hentikan MusikAlbum dan kembalikan Hadirmu
+        stopAlbumMusic();
+
         setTimeout(() => {
           const s4 = document.getElementById('s4');
           if (!s4) return;
@@ -2561,6 +2635,9 @@
             // Lock scroll after centering completes
             setTimeout(() => {
               document.body.classList.add('locked-scroll');
+
+              // Mulai musik album (mute Hadirmu, play MusikAlbum)
+              startAlbumMusic();
 
               // Cinematic opening
               setTimeout(() => {
