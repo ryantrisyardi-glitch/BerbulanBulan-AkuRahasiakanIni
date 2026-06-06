@@ -443,7 +443,11 @@
       max-width: 480px;
       pointer-events: none;
       opacity: 0;
-      animation: s1TextFade 1.5s 3.5s forwards, s1TextFloat 4s ease-in-out infinite;
+      transition: opacity 1.5s ease;
+    }
+    .s1-info-text.visible {
+      opacity: 1;
+      animation: s1TextFloat 4s ease-in-out infinite;
     }
 
     .s1-info-text h2 {
@@ -1887,7 +1891,7 @@
 
     <div class="book-controls">
       <button class="book-btn" id="book-prev">‹ &nbsp; Sebelumnya</button>
-      <div class="book-page-indicator"><span id="book-current-sheet">1</span> / <span id="book-total-sheets">6</span>
+      <div class="book-page-indicator"><span id="book-current-sheet">1</span> / <span id="book-total-sheets">11</span>
       </div>
       <button class="book-btn" id="book-next">Selanjutnya &nbsp; ›</button>
     </div>
@@ -2221,7 +2225,14 @@
         // 6. Fade overlay out after 1.8s
         setTimeout(() => {
           overlay.classList.add('fade-out');
-          setTimeout(() => { overlay.style.display = 'none'; }, 1200);
+          setTimeout(() => {
+            overlay.style.display = 'none';
+            // 7. Show s1-info-text after 4s delay from overlay gone
+            setTimeout(() => {
+              const infoText = document.querySelector('.s1-info-text');
+              if (infoText) infoText.classList.add('visible');
+            }, 4000);
+          }, 1200);
         }, 1800);
 
       }, 350);
@@ -2372,7 +2383,7 @@
         });
       }
 
-      // Sheet 8: Caption 8 (front) + Outro (back)
+      // Sheet 8: Caption 8 (front) + Outro Page 1 (back)
       sheetsData.push({
         front: {
           type: 'caption',
@@ -2382,21 +2393,40 @@
         },
         back: {
           type: 'outro',
-          header: '🤗 Untuk Selamanya',
-          content: 'Semua perjalanan ini bukan kebetulan. Kelahiranmu bukan tidak diinginkan atau direncanakan, tapi Allah sudah tuliskan jauh sebelum kita lahir bahwa kamu akan bersamaku pada akhirnya.<br><br>Abah tetap hadir sampai anak kita lahir, abah tidak mewakilkan pernikahanmu kepada siapa pun sehingga aku dapat berjabat tangan dengan abah saat ijab kabul, abah juga masih sempat mengasuh anak kita.<br><br>Saat ini, semua sudah abah ceritakan kepada mamah di taman surga-Nya Allah, dan mamah sama abah saat ini bangga sama kamu.<br><br>Kamu kuat, hebat, dan penuh cinta. Mereka menyaksikan bagaimana anak kecil yang dulu mereka besarkan telah tumbuh menjadi wanita yang kuat, hebat, dan penuh cinta.<br><br>Karena itu, teruslah melangkah. Jadilah wanita yang semakin shalihah, istri yang terbaik, dan ibu yang penuh kasih sayang.',
+          header: '✨ Bukan Kebetulan',
+          content: 'Semua perjalanan ini bukan kebetulan. Kelahiranmu bukan tidak diinginkan atau direncanakan, tapi Allah sudah tuliskan jauh sebelum kita lahir bahwa kamu akan bersamaku pada akhirnya.',
           pageNum: 17
         }
       });
 
-      // Sheet 9: Back Cover (front) + Blank (back)
+      // Sheet 9: Outro Page 2 (front) + Outro Page 3 (back)
       sheetsData.push({
         front: {
-          type: 'back-cover',
-          title: 'Perjalanan Bidadari, Akan Terus Berlanjut',
-          badge: '💌'
+          type: 'outro',
+          header: '🤝 Abah yang Setia',
+          content: 'Abah tetap hadir sampai anak kita lahir, abah tidak mewakilkan pernikahanmu kepada siapa pun sehingga aku dapat berjabat tangan dengan abah saat ijab kabul, abah juga masih sempat mengasuh anak kita.',
+          pageNum: 18
         },
         back: {
-          type: 'blank'
+          type: 'outro',
+          header: '🌸 Di Taman Surga-Nya',
+          content: 'Saat ini, semua sudah abah ceritakan kepada mamah di taman surga-Nya Allah, dan mamah sama abah saat ini bangga sama kamu.\n\nKamu kuat, hebat, dan penuh cinta. Mereka menyaksikan bagaimana anak kecil yang dulu mereka besarkan telah tumbuh menjadi wanita yang kuat, hebat, dan penuh cinta.',
+          pageNum: 19
+        }
+      });
+
+      // Sheet 10: Outro Page 4 (front) + blank inside (back)
+      sheetsData.push({
+        front: {
+          type: 'outro',
+          header: '🌹 Teruslah Melangkah',
+          content: 'Karena itu, teruslah melangkah.\n\nJadilah wanita yang semakin shalihah, istri yang terbaik, dan ibu yang penuh kasih sayang.',
+          pageNum: 20
+        },
+        back: {
+          type: 'back-cover',
+          badge: '💌',
+          title: 'Perjalanan Bidadari,\nAkan Terus Berlanjut'
         }
       });
 
@@ -2481,7 +2511,7 @@
             <div class="book-page-container outro-page">
               <div class="book-page-header">${faceData.header}</div>
               <div class="book-text-content">
-                <p>${faceData.content}</p>
+                <p style="white-space:pre-line">${faceData.content}</p>
               </div>
               <div class="book-page-footer">
                 <span>Halaman ${faceData.pageNum}</span>
@@ -2491,9 +2521,15 @@
         } else if (faceData.type === 'back-cover') {
           faceElement.innerHTML = `
             <div class="cover-border"></div>
-            <div class="cover-content">
-              <div class="cover-badge">${faceData.badge}</div>
-              <h2 class="cover-title" style="font-size:16px; color:rgba(220,190,110,0.65)">${faceData.title}</h2>
+            <div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 30%, rgba(220,190,110,0.07) 0%, transparent 70%)"></div>
+            <div class="cover-content" style="gap:0; padding: 10px 0;">
+              <div style="width:36px;height:1px;background:linear-gradient(90deg,transparent,rgba(220,190,110,0.45),transparent);margin-bottom:20px"></div>
+              <div class="cover-badge" style="font-size:26px;margin-bottom:18px;filter:drop-shadow(0 0 8px rgba(255,200,80,0.5))">${faceData.badge}</div>
+              <h2 class="cover-title" style="font-size:17px;line-height:1.65;color:#e8c870;white-space:pre-line;margin-bottom:20px">${faceData.title}</h2>
+              <div style="width:50px;height:1px;background:linear-gradient(90deg,transparent,rgba(220,190,110,0.45),transparent);margin-bottom:22px"></div>
+              <p style="font-family:'Cormorant Garamond',serif;font-size:11.5px;letter-spacing:0.25em;color:rgba(220,190,110,0.4);text-transform:uppercase;margin-bottom:6px">sebuah persembahan cinta</p>
+              <p style="font-family:'Playwrite GB J',cursive;font-size:10.5px;color:rgba(240,225,200,0.35);letter-spacing:0.1em">untukmu, yang selalu di hati</p>
+              <div style="width:36px;height:1px;background:linear-gradient(90deg,transparent,rgba(220,190,110,0.3),transparent);margin-top:22px"></div>
             </div>`;
         } else {
           faceElement.innerHTML = `<div style="width:100%;height:100%;background:transparent"></div>`;
@@ -2504,31 +2540,18 @@
       let curState = 0;
       let bookCompleted = false;
       let bookLockTriggered = false;
+      let glitchReady = false; // true setelah buku pernah selesai sekali
 
       function finishBookAndStartGlitch() {
         bookCompleted = true;
-        document.body.classList.remove('locked-scroll'); // Unlock scroll for transition
+        glitchReady = true; // aktifkan trigger glitch saat scroll
 
-        // Hentikan MusikAlbum dan kembalikan Hadirmu
-        stopAlbumMusic();
-
+        // Buku diam di halaman back cover terakhir (tidak kembali ke cover depan)
+        // Setelah jeda singkat: unlock scroll + stop musik album
         setTimeout(() => {
-          const s4 = document.getElementById('s4');
-          if (!s4) return;
-          s4.style.display = 'flex';
-
-          // Scroll smoothly to s4
-          const targetY = s4.offsetTop;
-          window.scrollTo({ top: targetY, behavior: 'smooth' });
-
-          // Lock scroll during glitch
-          setTimeout(() => {
-            document.body.classList.add('locked-scroll');
-            if (typeof runGlitch === 'function') {
-              runGlitch();
-            }
-          }, 800);
-        }, 1500); // 1.5s delay to let user see back cover
+          document.body.classList.remove('locked-scroll');
+          stopAlbumMusic();
+        }, 800);
       }
 
       function updateBook() {
@@ -2565,10 +2588,11 @@
       }
 
       function goNext() {
+        // Setelah buku selesai, tetap bisa navigasi (tidak di-lock)
         if (curState < totalSheets) {
           curState++;
           updateBook();
-          if (curState === totalSheets) {
+          if (curState === totalSheets && !bookCompleted) {
             finishBookAndStartGlitch();
           }
         }
@@ -2580,6 +2604,22 @@
           updateBook();
         }
       }
+
+      // Trigger glitch saat user scroll melewati/keluar dari section album setelah buku selesai
+      const glitchScrollIO = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (!e.isIntersecting && glitchReady) {
+            glitchReady = false; // hanya sekali
+            const s4 = document.getElementById('s4');
+            if (s4 && typeof runGlitch === 'function') {
+              document.body.classList.add('locked-scroll');
+              s4.style.display = 'flex';
+              runGlitch();
+            }
+          }
+        });
+      }, { threshold: 0.05 });
+      glitchScrollIO.observe(document.getElementById('s-album'));
 
       btnNext.onclick = goNext;
       btnPrev.onclick = goPrev;
@@ -2639,12 +2679,7 @@
               // Mulai musik album (mute Hadirmu, play MusikAlbum)
               startAlbumMusic();
 
-              // Cinematic opening
-              setTimeout(() => {
-                if (curState === 0) {
-                  goNext();
-                }
-              }, 400);
+              // Buku tetap tertutup — user harus tap/klik cover untuk membuka
             }, 800);
 
             albumIO.disconnect();
