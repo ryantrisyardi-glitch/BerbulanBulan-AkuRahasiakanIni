@@ -861,15 +861,16 @@
 
     /* Tap-to-play cover */
     .vid-cover {
-      position: absolute; inset: 0; z-index: 20;
-      background: linear-gradient(180deg, rgba(4,4,20,.7) 0%, rgba(8,4,28,.82) 100%);
+      position: absolute; inset: 0; z-index: 30;
+      background: linear-gradient(180deg, rgba(4,4,20,.72) 0%, rgba(8,4,28,.85) 100%);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center; gap: 14px;
       cursor: pointer;
       transition: opacity .5s ease;
-      backdrop-filter: blur(4px);
+      border-radius: 8px 8px 0 0;
+      pointer-events: all;
     }
-    .vid-cover.hidden { opacity: 0; pointer-events: none }
+    .vid-cover.hidden { opacity: 0; pointer-events: none; }
 
     .vid-cover-ring {
       width: 68px; height: 68px; border-radius: 50%;
@@ -901,11 +902,6 @@
     }
 
     /* Glitch layers — above iframe, below scanlines */
-    .vid-glitch-r, .vid-glitch-b {
-      position: absolute; inset: 0; z-index: 9;
-      pointer-events: none; border-radius: 8px;
-      opacity: 0; mix-blend-mode: screen;
-    }
     .vid-glitch-r { background: rgba(255,20,20,.2) }
     .vid-glitch-b { background: rgba(20,60,255,.2) }
     .vid-paper.glitch .vid-glitch-r { animation: vGR .2s steps(2) }
@@ -921,12 +917,19 @@
       100% { opacity:0 }
     }
 
-    /* Film grain canvas */
+    /* Film grain canvas — inside vid-iframe-wrap, pointer-events:none */
     #vid-grain {
-      position: absolute; inset: 0; z-index: 10;
-      pointer-events: none; border-radius: 8px;
+      position: absolute; inset: 0; z-index: 7;
+      pointer-events: none; border-radius: 8px 8px 0 0;
       opacity: .05; mix-blend-mode: overlay;
       width: 100%; height: 100%;
+    }
+
+    /* Glitch — inside vid-paper, absolute full, pointer-events:none */
+    .vid-glitch-r, .vid-glitch-b {
+      position: absolute; inset: 0; z-index: 7;
+      pointer-events: none; border-radius: 8px;
+      opacity: 0; mix-blend-mode: screen;
     }
 
     /* Ambient pulsing bar at bottom */
@@ -2800,20 +2803,15 @@
       <div class="vid-filmstrip right" id="vid-fs-right"></div>
 
       <div class="vid-paper" id="vid-paper">
-        <!-- Effects sit above iframe, pointer-events:none -->
-        <div class="vid-glitch-r" id="vgr"></div>
-        <div class="vid-glitch-b" id="vgb"></div>
-        <canvas id="vid-grain"></canvas>
-        <!-- Scanlines + vignette via ::before ::after on vid-paper -->
+        <!-- Glitch layers — pointer-events:none, sit over entire paper -->
+        <div class="vid-glitch-r"></div>
+        <div class="vid-glitch-b"></div>
 
-        <!-- Local video element — plays file chosen from device -->
+        <!-- Video wrapper: portrait 9:16 -->
         <div class="vid-iframe-wrap">
-          <video
-        <!-- Hidden preload elements for parts 2 & 3 -->
-        <link rel="preload" as="fetch" href="https://raw.githubusercontent.com/ryantrisyardi-glitch/BerbulanBulan-AkuRahasiakanIni/main/HBD-2.mp4" crossorigin>
+          <!-- Grain canvas inside here so cover z-index 30 beats it -->
+          <canvas id="vid-grain"></canvas>
 
-        <!-- Main video element -->
-        <div class="vid-iframe-wrap">
           <video
             id="vid-local"
             playsinline
@@ -2821,14 +2819,14 @@
             style="width:100%;height:100%;object-fit:cover;display:block;background:#000;border-radius:8px 8px 0 0;"
           ></video>
 
-          <!-- Cinematic transition overlay (black fade between parts) -->
+          <!-- Fade overlay antar part -->
           <div id="vid-transition" style="
             position:absolute;inset:0;z-index:25;
             background:#000;opacity:0;pointer-events:none;
             transition:opacity .6s ease;border-radius:8px 8px 0 0;
           "></div>
 
-          <!-- Segment badge (Part 1/3 etc) -->
+          <!-- Badge Part X/3 -->
           <div id="vid-segment-badge" style="
             position:absolute;top:12px;right:12px;z-index:22;
             background:rgba(0,0,0,.55);backdrop-filter:blur(6px);
@@ -2838,21 +2836,21 @@
             opacity:0;transition:opacity .5s ease;
           "></div>
 
-          <!-- Loading spinner (shown while switching parts) -->
+          <!-- Loading spinner -->
           <div id="vid-loading" style="
             position:absolute;inset:0;z-index:24;
             display:none;align-items:center;justify-content:center;
-            background:rgba(0,0,0,.6);border-radius:8px 8px 0 0;
+            background:rgba(0,0,0,.55);border-radius:8px 8px 0 0;
           ">
             <div style="
               width:40px;height:40px;border-radius:50%;
-              border:2px solid rgba(200,168,64,.2);
+              border:2px solid rgba(200,168,64,.18);
               border-top-color:rgba(200,168,64,.9);
               animation:spinLoad .8s linear infinite;
             "></div>
           </div>
 
-          <!-- Initial play cover -->
+          <!-- Cover tap-to-play -->
           <div class="vid-cover" id="vid-cover">
             <div class="vid-cover-ring">
               <div class="vid-cover-icon">▶</div>
@@ -2860,32 +2858,30 @@
             <p class="vid-cover-text">Tap untuk memutar</p>
             <p class="vid-cover-sub">video kenangan · 3 bagian</p>
           </div>
-        </div>
+        </div><!-- /vid-iframe-wrap -->
 
-        <!-- Ambient + controls -->
+        <!-- Ambient shimmer + controls -->
         <div class="vid-ambient-bar">
           <div class="vid-ambient-pulse"></div>
         </div>
         <div class="vid-ctrl-panel" id="vid-ctrl-panel">
-          <!-- Unified seeker with segment markers -->
           <div class="vid-seeker-wrap" id="vid-seeker">
             <div class="vid-seeker-track"></div>
             <div class="vid-seeker-buf" id="vid-seeker-buf"></div>
             <div class="vid-seeker-fill" id="vid-seeker-fill"></div>
-            <!-- Segment markers injected by JS -->
             <div id="vid-seg-markers"></div>
             <div class="vid-seeker-thumb" id="vid-seeker-thumb"></div>
           </div>
-          <!-- Buttons -->
           <div class="vid-ctrl-row">
             <button class="vid-btn-play" id="vid-btn-play">▶</button>
-            <button class="vid-btn-sm" id="vid-btn-replay" title="Ulangi dari awal">↺</button>
-            <span class="vid-time-label" id="vid-time-label">0:00 / 0:00</span>
-            <button class="vid-btn-sm" id="vid-btn-mute">🔊</button>
-            <button class="vid-btn-sm" id="vid-btn-fs" title="Layar penuh">⛶</button>
+            <button class="vid-btn-sm"   id="vid-btn-replay" title="Ulangi dari awal">↺</button>
+            <span   class="vid-time-label" id="vid-time-label">0:00 / 0:00</span>
+            <button class="vid-btn-sm"   id="vid-btn-mute">🔊</button>
+            <button class="vid-btn-sm"   id="vid-btn-fs" title="Layar penuh">⛶</button>
           </div>
         </div>
-      </div>
+
+      </div><!-- /vid-paper -->
 
       <!-- Ink flourish below paper -->
       <svg class="ink-flourish" viewBox="0 0 200 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="margin-top:14px;">
@@ -4591,14 +4587,15 @@
         curPart      = idx;
         globalOffset = partDurs.slice(0, idx).reduce((a,b) => a+b, 0);
 
-        // Show loader
-        if (loadEl) loadEl.style.display = 'flex';
+        // Only show spinner if this is NOT a seamless auto-advance
+        // (seamless = autoPlay=true and startAt=0 meaning it just ended)
+        const seamless = autoPlay && startAt === 0 && idx > 0;
+        if (!seamless && loadEl) loadEl.style.display = 'flex';
 
         vidEl.src = PARTS[idx];
         vidEl.load();
 
         vidEl.onloadedmetadata = () => {
-          // Store duration
           if (!partDurs[idx]) {
             partDurs[idx] = vidEl.duration || 0;
             totalDur = partDurs.reduce((a,b)=>a+b,0);
@@ -4611,7 +4608,7 @@
             isPlaying = true;
             btnPlay && (btnPlay.textContent = '⏸');
           }
-          showBadge(`Part ${idx+1} / ${PARTS.length}`);
+          if (!seamless) showBadge(`Part ${idx+1} / ${PARTS.length}`);
         };
       }
 
@@ -4670,26 +4667,33 @@
 
       vidEl && vidEl.addEventListener('timeupdate', updateSeeker);
 
-      // ── Part ended → transition to next ──
+      // ── Preload next part when current is near end (~10s before) ──
+      let preloadedNext = -1;
+      vidEl && vidEl.addEventListener('timeupdate', () => {
+        if (!vidEl.duration) return;
+        const timeLeft = vidEl.duration - vidEl.currentTime;
+        const nextIdx  = curPart + 1;
+        if (timeLeft < 10 && nextIdx < PARTS.length && preloadedNext !== nextIdx) {
+          preloadedNext = nextIdx;
+          // Create hidden video to preload next part into browser cache
+          const pre = document.createElement('video');
+          pre.preload = 'auto';
+          pre.src = PARTS[nextIdx];
+          pre.style.display = 'none';
+          document.body.appendChild(pre);
+          pre.load();
+          // Remove after 30s (it's cached by then)
+          setTimeout(() => { pre.src = ''; pre.remove(); }, 30000);
+        }
+      });
+
+      // ── Part ended → instant switch, NO transition, NO black flash ──
       vidEl && vidEl.addEventListener('ended', () => {
         if (curPart < PARTS.length - 1) {
-          // Cinematic fade transition
-          if (transEl) {
-            transEl.style.transition = 'opacity .5s ease';
-            transEl.style.opacity    = '1';
-          }
-          triggerGlitch(3);
-          setTimeout(() => {
-            loadPart(curPart + 1, 0, true);
-            setTimeout(() => {
-              if (transEl) {
-                transEl.style.transition = 'opacity .8s ease';
-                transEl.style.opacity    = '0';
-              }
-            }, 400);
-          }, 500);
+          // Immediately load next part and play — no fade, no delay
+          loadPart(curPart + 1, 0, true);
         } else {
-          // All done
+          // All 3 parts done
           isPlaying = false;
           btnPlay && (btnPlay.textContent = '▶');
           showBadge('Selesai ✦');
@@ -4701,16 +4705,7 @@
       if (cover) {
         cover.addEventListener('click', () => {
           cover.classList.add('hidden');
-          triggerGlitch(4);
-          // Cinematic entry flash
-          if (transEl) {
-            transEl.style.transition = 'none';
-            transEl.style.opacity    = '1';
-            setTimeout(() => {
-              transEl.style.transition = 'opacity 1s ease';
-              transEl.style.opacity    = '0';
-            }, 80);
-          }
+          triggerGlitch(2);
           loadPart(0, 0, true);
           preloadDurations();
         });
@@ -4737,23 +4732,11 @@
         partDurs = [0, 0, 0];
         totalDur = 0;
         markersBuilt = false;
+        preloadedNext = -1;
         if (segMarkers) segMarkers.innerHTML = '';
-        triggerGlitch(3);
-        if (transEl) {
-          transEl.style.transition = 'opacity .4s ease';
-          transEl.style.opacity = '1';
-          setTimeout(() => {
-            loadPart(0, 0, true);
-            preloadDurations();
-            setTimeout(() => {
-              transEl.style.transition = 'opacity .8s ease';
-              transEl.style.opacity = '0';
-            }, 400);
-          }, 400);
-        } else {
-          loadPart(0, 0, true);
-          preloadDurations();
-        }
+        triggerGlitch(2);
+        loadPart(0, 0, true);
+        preloadDurations();
       });
 
       // ── Mute ──
