@@ -658,6 +658,35 @@
       opacity: 1;
     }
 
+    /* ══ GIFTROOM JUMP — tombol kecil pojok, tidak eye-catching ══ */
+    .giftroom-jump {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: rgba(255,255,255,.32);
+      font-size: 11px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      z-index: 25;
+      opacity: 0;
+      transition: opacity 1.5s ease, color .3s, background .3s;
+      cursor: pointer;
+    }
+    .giftroom-jump.visible {
+      opacity: .55;
+    }
+    .giftroom-jump:hover {
+      color: rgba(255,255,255,.7);
+      background: rgba(255,255,255,.12);
+    }
+
     .mouse-body {
       width: 26px;
       height: 42px;
@@ -1062,6 +1091,362 @@
       pointer-events: none; z-index: 1;
     }
     /* ══ END S-VIDEO CSS ══ */
+
+    /* ══════════════════════════════════════════
+       S-GIFTROOM: RUANG HADIAH TERSEMBUNYI
+       ══════════════════════════════════════════ */
+    #s-giftroom {
+      position: relative;
+      padding: 64px 20px 80px;
+      background: linear-gradient(180deg, #f4ede0 0%, #ede3d0 60%, #e6dac2 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .gr-glow {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70%;
+      height: 40%;
+      background: radial-gradient(ellipse, rgba(220,170,90,.16) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .gr-eyebrow {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12px;
+      letter-spacing: .4em;
+      color: rgba(150,100,40,.55);
+      text-transform: lowercase;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .gr-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(22px, 5.5vw, 30px);
+      font-weight: 600;
+      text-align: center;
+      color: #4a3520;
+      line-height: 1.35;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    .gr-title em {
+      font-style: italic;
+      color: #a06628;
+      font-weight: 500;
+    }
+
+    .gr-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px;
+      color: rgba(90,65,35,.65);
+      text-align: center;
+      margin-bottom: 22px;
+      max-width: 320px;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+
+    .gr-progress {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12.5px;
+      letter-spacing: .12em;
+      color: rgba(120,85,40,.7);
+      background: rgba(255,255,255,.5);
+      border: 1px solid rgba(180,130,60,.25);
+      border-radius: 20px;
+      padding: 6px 18px;
+      margin-bottom: 26px;
+      position: relative;
+      z-index: 1;
+      transition: transform .3s ease;
+    }
+    .gr-progress.bump {
+      transform: scale(1.12);
+    }
+    .gr-progress #gr-progress-count {
+      font-weight: 700;
+      color: #a06628;
+    }
+
+    /* ── Room wrapper ── */
+    .gr-room-wrap {
+      position: relative;
+      width: min(720px, 94vw);
+      border-radius: 10px;
+      overflow: visible;
+      box-shadow:
+        0 2px 0 rgba(255,255,255,.4) inset,
+        0 18px 50px rgba(90,60,20,.18),
+        0 4px 14px rgba(90,60,20,.12);
+      z-index: 1;
+    }
+
+    #gr-room-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 10px;
+      background: #ece2cf;
+    }
+
+    /* ── Hotspots ── */
+    .gr-hotspot {
+      cursor: pointer;
+      transform-origin: center;
+      transform-box: fill-box;
+    }
+    .gr-tap-target {
+      cursor: pointer;
+    }
+    .gr-hotspot:focus {
+      outline: none;
+    }
+    .gr-hotspot:focus .gr-tap-target {
+      stroke: rgba(180,130,60,.6);
+      stroke-width: 2;
+      stroke-dasharray: 4 3;
+    }
+
+    /* Wiggle/bounce animation when clicked */
+    @keyframes gr-wiggle {
+      0%   { transform: scale(1) rotate(0deg); }
+      20%  { transform: scale(1.08) rotate(-3deg); }
+      40%  { transform: scale(0.96) rotate(3deg); }
+      60%  { transform: scale(1.05) rotate(-2deg); }
+      80%  { transform: scale(0.98) rotate(1deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    .gr-hotspot.gr-wiggling {
+      animation: gr-wiggle .6s ease-in-out;
+    }
+
+    /* Clock-specific pulse hint (subtle, not eye-catching, just a slow breathing glow) */
+    @keyframes gr-clock-breathe {
+      0%, 100% { filter: drop-shadow(0 0 0px rgba(220,170,90,0)); }
+      50%      { filter: drop-shadow(0 0 6px rgba(220,170,90,.5)); }
+    }
+    .gr-hotspot-main {
+      animation: gr-clock-breathe 3.2s ease-in-out infinite;
+    }
+
+    /* ── Tooltip ── */
+    .gr-tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: rgba(40,28,14,.92);
+      color: #fdf6e8;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13.5px;
+      line-height: 1.4;
+      padding: 10px 16px;
+      border-radius: 14px;
+      max-width: 220px;
+      text-align: center;
+      opacity: 0;
+      transform: translate(-50%, -10px) scale(.9);
+      transition: opacity .3s ease, transform .3s ease;
+      z-index: 20;
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
+    }
+    .gr-tooltip::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid rgba(40,28,14,.92);
+    }
+    .gr-tooltip.show {
+      opacity: 1;
+      transform: translate(-50%, -100%) scale(1);
+    }
+
+    /* ── Particles ── */
+    #gr-particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 15;
+      overflow: visible;
+    }
+    .gr-spark {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: gr-spark-fly .8s ease-out forwards;
+    }
+    @keyframes gr-spark-fly {
+      0%   { opacity: 1; transform: translate(0,0) scale(1); }
+      100% { opacity: 0; transform: translate(var(--gx), var(--gy)) scale(.3); }
+    }
+
+    /* ══ WATCH REVEAL ══ */
+    .gr-watch-reveal {
+      position: fixed;
+      inset: 0;
+      z-index: 9500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10,6,2,0);
+      transition: background .6s ease;
+    }
+    .gr-watch-reveal.active {
+      display: flex;
+      background: rgba(10,6,2,.78);
+    }
+
+    /* Portal effect */
+    .gr-portal {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff8d8 0%, #f0c860 35%, #c89030 65%, transparent 100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .gr-portal.opening {
+      animation: gr-portal-open 1.1s cubic-bezier(.2,.9,.3,1.1) forwards;
+    }
+    @keyframes gr-portal-open {
+      0%   { opacity: 0; transform: scale(0.3); filter: blur(0px); }
+      35%  { opacity: 1; transform: scale(2.2); filter: blur(1px); }
+      70%  { opacity: 1; transform: scale(7); filter: blur(0px); }
+      100% { opacity: 0; transform: scale(11); filter: blur(2px); }
+    }
+
+    /* Watch card */
+    .gr-watch-card {
+      position: relative;
+      width: min(320px, 88vw);
+      background: linear-gradient(160deg, #fffaf0, #f4ecd8);
+      border-radius: 20px;
+      padding: 32px 26px 28px;
+      text-align: center;
+      box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 4px 0 rgba(255,255,255,.5) inset;
+      opacity: 0;
+      transform: scale(.7) translateY(30px);
+      transition: opacity .6s cubic-bezier(.2,.9,.3,1.1), transform .6s cubic-bezier(.2,.9,.3,1.1);
+    }
+    .gr-watch-reveal.active .gr-watch-card {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      transition-delay: .5s;
+    }
+
+    .gr-watch-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,.06);
+      color: rgba(80,60,30,.6);
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s;
+    }
+    .gr-watch-close:hover {
+      background: rgba(0,0,0,.12);
+    }
+
+    .gr-watch-badge {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 11px;
+      letter-spacing: .3em;
+      color: #a06628;
+      margin-bottom: 18px;
+    }
+
+    .gr-watch-img-wrap {
+      position: relative;
+      width: 160px;
+      height: 190px;
+      margin: 0 auto 16px;
+    }
+    .gr-watch-glow {
+      position: absolute;
+      inset: -20px;
+      background: radial-gradient(ellipse, rgba(220,170,90,.35) 0%, transparent 70%);
+      animation: gr-watch-pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes gr-watch-pulse {
+      0%, 100% { opacity: .6; transform: scale(1); }
+      50%      { opacity: 1;  transform: scale(1.08); }
+    }
+    .gr-watch-svg {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,.3));
+    }
+
+    .gr-watch-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 19px;
+      font-weight: 700;
+      color: #3a2a14;
+      margin-bottom: 6px;
+    }
+    .gr-watch-desc {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      color: rgba(80,60,30,.7);
+      margin-bottom: 14px;
+    }
+    .gr-watch-specs {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 18px;
+      text-align: left;
+      display: inline-block;
+    }
+    .gr-watch-specs li {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12.5px;
+      color: rgba(70,50,25,.8);
+      padding-left: 18px;
+      position: relative;
+      margin-bottom: 5px;
+    }
+    .gr-watch-specs li::before {
+      content: '✦';
+      position: absolute;
+      left: 0;
+      color: #c89030;
+      font-size: 10px;
+    }
+    .gr-watch-note {
+      font-family: 'Playwrite GB J', cursive;
+      font-size: 13px;
+      color: #a06628;
+      font-style: italic;
+    }
+
+    /* ══ END S-GIFTROOM CSS ══ */
 
     /* ══ GALLERY EXHIBIT TAGS ══ */
     .gallery-exhibit-tag {
@@ -2607,6 +2992,11 @@
       </div>
       <span class="mouse-label">scroll</span>
     </div>
+
+    <!-- Direct-access ke section hadiah tersembunyi — subtle, pojok kecil -->
+    <a href="#s-giftroom" class="giftroom-jump" id="giftroom-jump" aria-label="Lompat ke ruang hadiah">
+      <span>✦</span>
+    </a>
   </section>
 
   <!-- ══ S2 ══ -->
@@ -2909,6 +3299,199 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ S-GIFTROOM: RUANG HADIAH TERSEMBUNYI ══ -->
+  <section id="s-giftroom">
+    <div class="gr-glow"></div>
+
+    <p class="gr-eyebrow">satu hal lagi…</p>
+    <h2 class="gr-title">Ada hadiah menunggumu<br><em>tapi kamu harus menemukannya</em></h2>
+    <p class="gr-sub">ketuk benda-benda di ruangan ini — ada yang lucu, ada satu yang berharga ✦</p>
+
+    <!-- Progress tracker -->
+    <div class="gr-progress" id="gr-progress">
+      <span id="gr-progress-count">0</span> / <span id="gr-progress-total">6</span> ditemukan
+    </div>
+
+    <!-- THE ROOM -->
+    <div class="gr-room-wrap" id="gr-room-wrap">
+      <svg id="gr-room-svg" viewBox="0 0 800 480" xmlns="http://www.w3.org/2000/svg">
+
+        <!-- ══ BACKGROUND ══ -->
+        <rect x="0" y="0" width="800" height="380" fill="#ece2cf"/>
+        <rect x="0" y="380" width="800" height="100" fill="#d8cab0"/>
+        <rect x="0" y="378" width="800" height="4" fill="#c4b596"/>
+
+        <!-- Ambient wall shadow -->
+        <rect x="0" y="0" width="800" height="380" fill="url(#gr-wallgrad)" opacity=".5"/>
+
+        <!-- ══ WALL ART (decorative, non-interactive) ══ -->
+        <g opacity=".9">
+          <rect x="56" y="78" width="92" height="110" rx="3" fill="#fff" opacity=".7"/>
+          <rect x="64" y="86" width="76" height="94" rx="2" fill="#7aa8a8"/>
+          <path d="M70 150 Q90 120 110 145 T132 130" stroke="#a8cdd0" stroke-width="4" fill="none" opacity=".7"/>
+
+          <rect x="178" y="50" width="108" height="150" rx="3" fill="#fff" opacity=".7"/>
+          <rect x="188" y="60" width="88" height="130" rx="2" fill="#b8bd92"/>
+          <path d="M196 150 Q220 100 244 140 T272 110" stroke="#cdd2a8" stroke-width="5" fill="none" opacity=".6"/>
+
+          <rect x="358" y="92" width="58" height="78" rx="3" fill="#fff" opacity=".7"/>
+          <rect x="365" y="99" width="44" height="64" rx="2" fill="#7090a0"/>
+        </g>
+
+        <!-- ══ JAM DINDING — HADIAH UTAMA ══ -->
+        <g id="gr-hotspot-clock" class="gr-hotspot gr-hotspot-main" data-id="clock" tabindex="0" role="button" aria-label="Jam dinding">
+          <circle cx="478" cy="120" r="36" fill="#fff" opacity=".85"/>
+          <circle cx="478" cy="120" r="30" fill="#9a9486" id="gr-clock-face"/>
+          <circle cx="478" cy="120" r="2.4" fill="#3a342a"/>
+          <line x1="478" y1="120" x2="478" y2="102" stroke="#3a342a" stroke-width="2.6" stroke-linecap="round" id="gr-clock-hand-h"/>
+          <line x1="478" y1="120" x2="490" y2="120" stroke="#3a342a" stroke-width="2" stroke-linecap="round" id="gr-clock-hand-m"/>
+          <!-- invisible larger tap target -->
+          <circle cx="478" cy="120" r="46" fill="transparent" class="gr-tap-target"/>
+        </g>
+
+        <!-- ══ HANGING LAMP (decorative) ══ -->
+        <line x1="700" y1="0" x2="700" y2="60" stroke="#5a4a30" stroke-width="2"/>
+        <path d="M668 60 L732 60 L716 96 L684 96 Z" fill="#e0a840"/>
+        <circle cx="700" cy="100" r="5" fill="#fff4d0"/>
+
+        <!-- ══ BOOKSHELF (decorative only, per request — tidak interaktif) ══ -->
+        <g opacity=".95">
+          <rect x="650" y="160" width="132" height="220" fill="#5a4632" rx="2"/>
+          <rect x="658" y="168" width="116" height="48" fill="#46362770"/>
+          <rect x="658" y="222" width="116" height="48" fill="#46362770"/>
+          <rect x="658" y="276" width="116" height="48" fill="#46362770"/>
+          <rect x="658" y="330" width="116" height="42" fill="#46362770"/>
+          <!-- spines -->
+          <rect x="664" y="172" width="7" height="40" fill="#c0533f"/>
+          <rect x="673" y="172" width="7" height="40" fill="#5c8a6e"/>
+          <rect x="682" y="172" width="6" height="40" fill="#3c6f8a"/>
+          <rect x="690" y="172" width="7" height="40" fill="#d4a23c"/>
+          <rect x="664" y="226" width="6" height="40" fill="#7d5ba0"/>
+          <rect x="672" y="226" width="7" height="40" fill="#c0533f"/>
+          <rect x="681" y="226" width="7" height="40" fill="#5c8a6e"/>
+          <rect x="664" y="280" width="7" height="40" fill="#3c6f8a"/>
+          <rect x="673" y="280" width="6" height="40" fill="#d4a23c"/>
+        </g>
+
+        <!-- ══ TALL PLANT (kiri) — HOTSPOT ══ -->
+        <g id="gr-hotspot-plant" class="gr-hotspot" data-id="plant" tabindex="0" role="button" aria-label="Tanaman">
+          <rect x="55" y="330" width="46" height="56" rx="4" fill="#6b4a34"/>
+          <rect x="58" y="333" width="40" height="6" fill="#7d5a40"/>
+          <path d="M78 332 C60 310 50 270 56 235 C68 268 78 300 80 332Z" fill="#5d8a52"/>
+          <path d="M78 332 C95 300 108 260 100 222 C85 258 78 298 76 332Z" fill="#6fa05f"/>
+          <path d="M78 332 C70 290 72 250 88 215 C92 252 86 296 80 332Z" fill="#7eb56c"/>
+          <circle cx="78" cy="358" r="56" fill="transparent" class="gr-tap-target"/>
+        </g>
+
+        <!-- ══ FLOOR LAMP (decorative, non-interactive untuk jaga fokus) ══ -->
+        <g opacity=".95">
+          <path d="M168 230 L210 230 L196 270 L182 270 Z" fill="#e0a840"/>
+          <ellipse cx="189" cy="232" rx="4" ry="3" fill="#fff4d0"/>
+          <line x1="189" y1="270" x2="189" y2="372" stroke="#7a5a34" stroke-width="3"/>
+          <line x1="189" y1="372" x2="160" y2="386" stroke="#7a5a34" stroke-width="3"/>
+          <line x1="189" y1="372" x2="218" y2="386" stroke="#7a5a34" stroke-width="3"/>
+        </g>
+
+        <!-- ══ SIDE TABLE + BUKU — HOTSPOT (buku) ══ -->
+        <rect x="232" y="340" width="92" height="8" fill="#8a6a48"/>
+        <rect x="240" y="348" width="8" height="38" fill="#7a5a3c"/>
+        <rect x="308" y="348" width="8" height="38" fill="#7a5a3c"/>
+        <g id="gr-hotspot-book" class="gr-hotspot" data-id="book" tabindex="0" role="button" aria-label="Buku">
+          <rect x="246" y="320" width="48" height="9" rx="1.5" fill="#e8e2d4"/>
+          <rect x="246" y="320" width="48" height="3" fill="#c0533f"/>
+          <rect x="250" y="306" width="42" height="9" rx="1.5" fill="#dcd6c6"/>
+          <rect x="250" y="306" width="42" height="3" fill="#3c6f8a"/>
+          <circle cx="270" cy="318" r="36" fill="transparent" class="gr-tap-target"/>
+        </g>
+
+        <!-- ══ TUMBLER — HOTSPOT ══ -->
+        <g id="gr-hotspot-tumbler" class="gr-hotspot" data-id="tumbler" tabindex="0" role="button" aria-label="Tumbler">
+          <rect x="300" y="300" width="16" height="26" rx="4" fill="#c9956a"/>
+          <rect x="300" y="300" width="16" height="6" rx="3" fill="#a87850"/>
+          <circle cx="308" cy="297" r="4" fill="#8a6038"/>
+          <circle cx="308" cy="313" r="30" fill="transparent" class="gr-tap-target"/>
+        </g>
+
+        <!-- ══ SOFA — HOTSPOT ══ -->
+        <g id="gr-hotspot-sofa" class="gr-hotspot" data-id="sofa" tabindex="0" role="button" aria-label="Sofa">
+          <rect x="368" y="260" width="320" height="100" rx="14" fill="#9b958a"/>
+          <rect x="368" y="230" width="320" height="60" rx="18" fill="#a8a296"/>
+          <rect x="356" y="250" width="30" height="92" rx="12" fill="#8e887c"/>
+          <rect x="686" y="250" width="30" height="92" rx="12" fill="#8e887c"/>
+          <rect x="368" y="334" width="320" height="22" rx="6" fill="#7d776c"/>
+          <rect x="392" y="356" width="12" height="22" rx="3" fill="#a87c4c"/>
+          <rect x="652" y="356" width="12" height="22" rx="3" fill="#a87c4c"/>
+          <circle cx="528" cy="300" r="120" fill="transparent" class="gr-tap-target"/>
+        </g>
+
+        <!-- ══ BANTAL ORANGE — HOTSPOT ══ -->
+        <g id="gr-hotspot-pillow-o" class="gr-hotspot" data-id="pillow-o" tabindex="0" role="button" aria-label="Bantal oranye">
+          <rect x="404" y="266" width="78" height="62" rx="10" fill="#e0a850" transform="rotate(-6 443 297)"/>
+          <line x1="412" y1="280" x2="460" y2="320" stroke="#fff" stroke-width="5" opacity=".5" transform="rotate(-6 443 297)"/>
+          <line x1="424" y1="272" x2="472" y2="312" stroke="#fff" stroke-width="5" opacity=".5" transform="rotate(-6 443 297)"/>
+          <circle cx="443" cy="297" r="48" fill="transparent" class="gr-tap-target"/>
+        </g>
+
+        <!-- ══ BANTAL HIJAU — HOTSPOT ══ -->
+        <g id="gr-hotspot-pillow-g" class="gr-hotspot" data-id="pillow-g" tabindex="0" role="button" aria-label="Bantal hijau">
+          <rect x="586" y="266" width="78" height="62" rx="10" fill="#7ea868" transform="rotate(6 625 297)"/>
+          <line x1="594" y1="280" x2="642" y2="320" stroke="#fff" stroke-width="5" opacity=".5" transform="rotate(6 625 297)"/>
+          <line x1="606" y1="272" x2="654" y2="312" stroke="#fff" stroke-width="5" opacity=".5" transform="rotate(6 625 297)"/>
+          <circle cx="625" cy="297" r="48" fill="transparent" class="gr-tap-target"/>
+        </g>
+
+        <!-- ══ RUG (decorative) ══ -->
+        <ellipse cx="528" cy="410" rx="220" ry="36" fill="#f4efe2" opacity=".75"/>
+        <ellipse cx="528" cy="410" rx="220" ry="36" fill="none" stroke="#d8cfb8" stroke-width="2"/>
+
+        <!-- ══ DEFS ══ -->
+        <defs>
+          <linearGradient id="gr-wallgrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fff" stop-opacity=".3"/>
+            <stop offset="100%" stop-color="#000" stop-opacity=".05"/>
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <!-- Tooltip layer (positioned via JS over hotspots) -->
+      <div id="gr-tooltip" class="gr-tooltip"></div>
+
+      <!-- Sparkle/particle layer -->
+      <div id="gr-particles"></div>
+    </div>
+
+    <!-- ══ WATCH REVEAL MODAL ══ -->
+    <div id="gr-watch-reveal" class="gr-watch-reveal">
+      <div class="gr-portal" id="gr-portal"></div>
+      <div class="gr-watch-card" id="gr-watch-card">
+        <button class="gr-watch-close" id="gr-watch-close" aria-label="Tutup">✕</button>
+        <div class="gr-watch-badge">✦ Hadiah Ditemukan ✦</div>
+        <div class="gr-watch-img-wrap">
+          <div class="gr-watch-glow"></div>
+          <svg viewBox="0 0 200 240" class="gr-watch-svg">
+            <rect x="60" y="10" width="80" height="30" rx="10" fill="#1a1a1a"/>
+            <rect x="60" y="200" width="80" height="30" rx="10" fill="#1a1a1a"/>
+            <rect x="45" y="55" width="110" height="130" rx="22" fill="#232323"/>
+            <rect x="53" y="63" width="94" height="114" rx="14" fill="#0a0e14"/>
+            <rect x="58" y="68" width="84" height="104" rx="10" fill="#0e1722"/>
+            <text x="100" y="105" text-anchor="middle" fill="#7ee0ff" font-size="22" font-family="monospace" font-weight="600">09:41</text>
+            <text x="100" y="128" text-anchor="middle" fill="#ffb070" font-size="11" font-family="monospace">♥ 78 BPM</text>
+            <circle cx="158" cy="95" r="5" fill="#e0a850"/>
+            <rect x="153" y="105" width="10" height="20" rx="3" fill="#e0a850"/>
+          </svg>
+        </div>
+        <h3 class="gr-watch-title">Redmi Watch 5 Active</h3>
+        <p class="gr-watch-desc">Layar besar 2" · Baterai 18 hari · Panggilan Bluetooth</p>
+        <ul class="gr-watch-specs">
+          <li>140+ mode olahraga, deteksi otomatis</li>
+          <li>Detak jantung &amp; oksigen darah 24 jam</li>
+          <li>Tahan air 5 ATM</li>
+        </ul>
+        <p class="gr-watch-note">selamat ulang tahun, sayang 🎁</p>
       </div>
     </div>
   </section>
@@ -3362,6 +3945,9 @@
                 // Show mouse scroll hint
                 const sh = document.getElementById('mouse-scroll-hint');
                 if (sh) sh.classList.add('visible');
+                // Show subtle giftroom jump button
+                const gj = document.getElementById('giftroom-jump');
+                if (gj) gj.classList.add('visible');
               }, 3500);
             }, 4000);
           }, 1200);
@@ -4324,6 +4910,21 @@
       requestAnimationFrame(tick);
     }
 
+    /* ══ GIFTROOM JUMP — smooth scroll, bypasses any active lock ══ */
+    (function () {
+      const jumpBtn = document.getElementById('giftroom-jump');
+      if (!jumpBtn) return;
+      jumpBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Force-unlock scroll in case it's mid-lock somewhere
+        document.body.classList.remove('locked-scroll');
+        const target = document.getElementById('s-giftroom');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    })();
+
     /* ══════════════════════════════════════════
        SCROLL LOCK SYSTEM
        ══════════════════════════════════════════ */
@@ -4862,10 +5463,191 @@
 
   </script>
 
-  </script>
+  <script>
+    /* ══════════════════════════════════════════
+       S-GIFTROOM: HIDDEN GEM HUNT
+       ══════════════════════════════════════════ */
+    (function () {
+      const room       = document.getElementById('gr-room-wrap');
+      const svg        = document.getElementById('gr-room-svg');
+      const tooltip    = document.getElementById('gr-tooltip');
+      const particles  = document.getElementById('gr-particles');
+      const progressEl = document.getElementById('gr-progress');
+      const progressCt = document.getElementById('gr-progress-count');
+      if (!room || !svg) return;
 
-  </script>
+      // ── Pesan lucu per hotspot (selain jam) ──
+      const MESSAGES = {
+        'pillow-o': 'Empuk banget, tapi gak seempuk pelukanmu 🧸',
+        'pillow-g': 'Ayang butuh bantal? oke papa catat 📝',
+        'book':     'Ini bukan novel cinta… tapi ceritamu lebih seru dari ini 📖',
+        'plant':    'Aku rawat kamu engga kayak ke tanaman, masa iya kamu disiram-siram terus 🌿',
+        'sofa':     'Beli yuk biar bisa main di sofa, wkwkwkwk 🛋️',
+        'tumbler':  'Kamu mau ini? aku bisa sulap nanti kalo kamu mau ini 🥤'
+      };
 
+      const TOTAL_NON_CLOCK = Object.keys(MESSAGES).length;
+      document.getElementById('gr-progress-total').textContent = TOTAL_NON_CLOCK;
+
+      const found = new Set();
+      const cooldown = new Set(); // prevent rapid spam re-trigger per hotspot
+
+      function bumpProgress() {
+        progressCt.textContent = found.size;
+        progressEl.classList.add('bump');
+        setTimeout(() => progressEl.classList.remove('bump'), 300);
+      }
+
+      function showTooltip(targetEl, text) {
+        const roomRect = room.getBoundingClientRect();
+        const tRect = targetEl.getBoundingClientRect();
+        const x = tRect.left + tRect.width / 2 - roomRect.left;
+        const y = tRect.top - roomRect.top;
+
+        tooltip.textContent = text;
+        tooltip.style.left = x + 'px';
+        tooltip.style.top  = Math.max(y, 30) + 'px';
+        tooltip.classList.add('show');
+
+        clearTimeout(tooltip._hideTimer);
+        tooltip._hideTimer = setTimeout(() => {
+          tooltip.classList.remove('show');
+        }, 2400);
+      }
+
+      function burstSparkles(targetEl) {
+        const roomRect = room.getBoundingClientRect();
+        const tRect = targetEl.getBoundingClientRect();
+        const cx = tRect.left + tRect.width / 2 - roomRect.left;
+        const cy = tRect.top + tRect.height / 2 - roomRect.top;
+
+        const colors = ['#f0c860','#e8a850','#7ea868','#d97a9c','#7aa8c8','#fff'];
+        const n = 10 + Math.floor(Math.random() * 4);
+
+        for (let i = 0; i < n; i++) {
+          const sp = document.createElement('div');
+          sp.className = 'gr-spark';
+          const angle = Math.random() * Math.PI * 2;
+          const dist  = 30 + Math.random() * 45;
+          sp.style.left = cx + 'px';
+          sp.style.top  = cy + 'px';
+          sp.style.background = colors[Math.floor(Math.random() * colors.length)];
+          sp.style.setProperty('--gx', Math.cos(angle) * dist + 'px');
+          sp.style.setProperty('--gy', Math.sin(angle) * dist + 'px');
+          sp.style.animationDelay = (Math.random() * 0.1) + 's';
+          particles.appendChild(sp);
+          setTimeout(() => sp.remove(), 900);
+        }
+      }
+
+      function handleHotspotClick(hotspotEl, id) {
+        // Wiggle animation
+        hotspotEl.classList.remove('gr-wiggling');
+        // restart animation
+        void hotspotEl.offsetWidth;
+        hotspotEl.classList.add('gr-wiggling');
+
+        // Sparkle burst
+        burstSparkles(hotspotEl);
+
+        // Tooltip message
+        const msg = MESSAGES[id];
+        if (msg) {
+          showTooltip(hotspotEl, msg);
+          if (!found.has(id)) {
+            found.add(id);
+            bumpProgress();
+          }
+        }
+      }
+
+      // ── Attach listeners to all non-clock hotspots ──
+      Object.keys(MESSAGES).forEach(id => {
+        const el = document.getElementById('gr-hotspot-' + id);
+        if (!el) return;
+        function trigger(e) {
+          e.preventDefault();
+          if (cooldown.has(id)) return;
+          cooldown.add(id);
+          setTimeout(() => cooldown.delete(id), 350);
+          handleHotspotClick(el, id);
+        }
+        el.addEventListener('click', trigger);
+        el.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') trigger(e);
+        });
+      });
+
+      // ── CLOCK HOTSPOT — the main gift ── //
+      const clockEl = document.getElementById('gr-hotspot-clock');
+      let clockOpened = false;
+
+      function openWatchReveal() {
+        if (clockOpened) return;
+        clockOpened = true;
+
+        const reveal = document.getElementById('gr-watch-reveal');
+        const portal = document.getElementById('gr-portal');
+        const card   = document.getElementById('gr-watch-card');
+
+        // Position portal at clock location (viewport coords)
+        const clockRect = clockEl.getBoundingClientRect();
+        const cx = clockRect.left + clockRect.width / 2;
+        const cy = clockRect.top + clockRect.height / 2;
+        portal.style.left = (cx - 20) + 'px';
+        portal.style.top  = (cy - 20) + 'px';
+
+        // Sparkle burst at clock first
+        burstSparkles(clockEl);
+        clockEl.classList.add('gr-wiggling');
+
+        // Show overlay (dark backdrop fades in)
+        reveal.classList.add('active');
+
+        // Trigger portal animation
+        requestAnimationFrame(() => {
+          portal.classList.add('opening');
+        });
+
+        // Card reveal happens via CSS transition-delay (.5s) once .active is set
+      }
+
+      clockEl && clockEl.addEventListener('click', e => {
+        e.preventDefault();
+        openWatchReveal();
+      });
+      clockEl && clockEl.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openWatchReveal(); }
+      });
+
+      // ── Close watch reveal ──
+      const closeBtn = document.getElementById('gr-watch-close');
+      const revealEl = document.getElementById('gr-watch-reveal');
+      function closeReveal() {
+        revealEl.classList.remove('active');
+        const portal = document.getElementById('gr-portal');
+        portal.classList.remove('opening');
+        setTimeout(() => { clockOpened = false; }, 400);
+      }
+      closeBtn && closeBtn.addEventListener('click', closeReveal);
+      revealEl && revealEl.addEventListener('click', e => {
+        if (e.target === revealEl) closeReveal();
+      });
+
+      // ── Clock ticking (subtle ambient motion) ──
+      (function tickClock() {
+        const minHand = document.getElementById('gr-clock-hand-m');
+        if (!minHand) return;
+        let angle = 0;
+        function frame() {
+          angle += 0.15;
+          minHand.setAttribute('transform', `rotate(${angle % 360} 478 120)`);
+          requestAnimationFrame(frame);
+        }
+        frame();
+      })();
+
+    })();
   </script>
 </body>
 
