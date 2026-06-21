@@ -1251,10 +1251,12 @@
       line-height: 1.4;
       padding: 10px 16px;
       border-radius: 14px;
-      max-width: 220px;
+      width: max-content;
+      max-width: min(220px, 78vw);
       text-align: center;
       opacity: 0;
-      transform: translate(-50%, -10px) scale(.9);
+      --tip-shift: 0px;
+      transform: translate(calc(-50% + var(--tip-shift)), -10px) scale(.9);
       transition: opacity .3s ease, transform .3s ease;
       z-index: 20;
       box-shadow: 0 8px 24px rgba(0,0,0,.25);
@@ -1263,7 +1265,7 @@
       content: '';
       position: absolute;
       bottom: -6px;
-      left: 50%;
+      left: calc(50% - var(--tip-shift));
       transform: translateX(-50%);
       width: 0; height: 0;
       border-left: 6px solid transparent;
@@ -1272,7 +1274,7 @@
     }
     .gr-tooltip.show {
       opacity: 1;
-      transform: translate(-50%, -100%) scale(1);
+      transform: translate(calc(-50% + var(--tip-shift)), -100%) scale(1);
     }
 
     /* ── Particles ── */
@@ -1444,6 +1446,297 @@
       font-size: 13px;
       color: #a06628;
       font-style: italic;
+    }
+
+    /* ══ PHOTO FRAMES ON WALL ══ */
+    .gr-photo-frame {
+      cursor: default;
+    }
+    .gr-photo-img {
+      cursor: default;
+    }
+
+    /* ══ VIDEO FRAME — EYE CATCHING, WIGGLES ══ */
+    .gr-video-frame-group {
+      cursor: pointer;
+    }
+    @keyframes gr-video-frame-wiggle {
+      0%   { transform: rotate(0deg); }
+      15%  { transform: rotate(-2.2deg); }
+      30%  { transform: rotate(1.8deg); }
+      45%  { transform: rotate(-1.6deg); }
+      60%  { transform: rotate(1.2deg); }
+      75%  { transform: rotate(-0.8deg); }
+      90%  { transform: rotate(0.4deg); }
+      100% { transform: rotate(0deg); }
+    }
+    #gr-video-frame-inner {
+      transform-origin: 252px 322px;
+      transform-box: fill-box;
+      animation: gr-video-frame-wiggle 3.6s ease-in-out infinite;
+    }
+    #gr-video-frame-tap {
+      cursor: pointer;
+    }
+    /* subtle glow pulse to hint it's special */
+    @keyframes gr-video-frame-glow {
+      0%, 100% { filter: drop-shadow(0 0 0px rgba(240,208,96,0)); }
+      50%      { filter: drop-shadow(0 0 10px rgba(240,208,96,.55)); }
+    }
+    .gr-video-frame-group {
+      animation: gr-video-frame-glow 3.6s ease-in-out infinite;
+    }
+
+    /* ══ LAMP GLOW ON CLICK ══ */
+    #gr-lamp-glow {
+      transition: opacity .4s ease;
+    }
+    .gr-lamp-lit #gr-lamp-glow {
+      opacity: .55;
+    }
+    .gr-lamp-lit #gr-lamp-bulb {
+      fill: #fffbe0;
+    }
+
+    /* ══ GIFTBOX LID ANIMATION ══ */
+    #gr-giftbox-lid {
+      transform-origin: 179px 400px;
+      transform-box: fill-box;
+      transition: transform .4s cubic-bezier(.3,1.5,.4,1);
+    }
+    .gr-giftbox-opened #gr-giftbox-lid {
+      transform: translateY(-18px) rotate(-18deg);
+    }
+
+    /* ══ FULLSCREEN VIDEO PLAYER (for wall video frame) ══ */
+    .gr-video-fullscreen {
+      position: fixed;
+      inset: 0;
+      z-index: 9700;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(4,4,10,0);
+      transition: background .5s ease;
+    }
+    .gr-video-fullscreen.active {
+      display: flex;
+      background: rgba(4,4,10,.92);
+    }
+
+    .gr-vfs-frame-wrap {
+      position: relative;
+      width: min(360px, 88vw);
+      opacity: 0;
+      transform: scale(.85);
+      transition: opacity .5s ease, transform .5s cubic-bezier(.2,.9,.3,1.1);
+    }
+    .gr-video-fullscreen.active .gr-vfs-frame-wrap {
+      opacity: 1;
+      transform: scale(1);
+      transition-delay: .15s;
+    }
+
+    .gr-vfs-frame-outer {
+      background: #f0e8d8;
+      border-radius: 2px;
+      padding: 14px;
+      box-shadow:
+        0 2px 8px rgba(0,0,0,.12),
+        0 8px 28px rgba(0,0,0,.4),
+        0 24px 60px rgba(0,0,0,.5);
+      position: relative;
+    }
+    .gr-vfs-frame-outer::before {
+      content: '';
+      position: absolute;
+      top: -16px; left: 50%; transform: translateX(-50%);
+      width: 150px; height: 32px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 32'%3E%3Cpath d='M75 16 C58 7,32 2,8 9 C26 8,40 14,52 13 C62 12,68 8,75 16 C82 8,88 12,98 13 C112 14,128 8,142 9 C118 2,92 7,75 16Z' fill='none' stroke='rgba(140,100,50,.35)' stroke-width='1.1' stroke-linecap='round'/%3E%3Ccircle cx='75' cy='16' r='2' fill='rgba(140,100,50,.3)'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-size: contain;
+      pointer-events: none;
+    }
+
+    .gr-vfs-frame-inner {
+      background: #e8deca;
+      border-radius: 1px;
+      padding: 6px;
+      box-shadow: inset 0 0 12px rgba(0,0,0,.08);
+    }
+
+    .gr-vfs-canvas {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9/16;
+      background: #000;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    #gr-vfs-video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #000;
+    }
+    .gr-vfs-glitch-r, .gr-vfs-glitch-b {
+      position: absolute; inset: 0; z-index: 5;
+      pointer-events: none; opacity: 0;
+      mix-blend-mode: screen;
+    }
+    .gr-vfs-glitch-r { background: rgba(255,20,20,.2) }
+    .gr-vfs-glitch-b { background: rgba(20,60,255,.2) }
+    .gr-vfs-canvas.glitch .gr-vfs-glitch-r { animation: gr-vfs-gr .2s steps(2) }
+    .gr-vfs-canvas.glitch .gr-vfs-glitch-b { animation: gr-vfs-gb .2s steps(2) }
+    @keyframes gr-vfs-gr {
+      0%   { opacity:1; clip-path:inset(12% 0 74% 0); transform:translateX(-6px) }
+      50%  { opacity:.7; clip-path:inset(55% 0 12% 0); transform:translateX(7px) }
+      100% { opacity:0 }
+    }
+    @keyframes gr-vfs-gb {
+      0%   { opacity:.8; clip-path:inset(38% 0 35% 0); transform:translateX(5px) }
+      50%  { opacity:.5; clip-path:inset(8% 0 65% 0); transform:translateX(-4px) }
+      100% { opacity:0 }
+    }
+    #gr-vfs-grain {
+      position: absolute; inset: 0; z-index: 6;
+      pointer-events: none; opacity: .05;
+      mix-blend-mode: overlay;
+    }
+    .gr-vfs-loading {
+      position: absolute; inset: 0; z-index: 8;
+      display: none; align-items: center; justify-content: center;
+      background: rgba(0,0,0,.5);
+    }
+    .gr-vfs-loading.show { display: flex; }
+    .gr-vfs-spinner {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 2px solid rgba(200,168,64,.2);
+      border-top-color: rgba(200,168,64,.9);
+      animation: spinLoad .8s linear infinite;
+    }
+
+    .gr-vfs-close {
+      position: absolute;
+      top: 24px; right: 24px;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.25);
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.85);
+      font-size: 15px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+      z-index: 10;
+    }
+    .gr-vfs-close:hover {
+      background: rgba(255,255,255,.18);
+    }
+
+    /* ══ MIRROR CAMERA FEED ══ */
+    .gr-mirror-cam-wrap {
+      position: absolute;
+      display: none;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 8;
+      border-radius: 26px;
+    }
+    .gr-mirror-cam-wrap.active {
+      display: block;
+    }
+    #gr-mirror-cam {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1); /* mirror flip, terasa seperti cermin asli */
+    }
+
+    /* ══ MIRROR MESSAGE POPUP ══ */
+    .gr-mirror-popup {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 9600;
+      background: rgba(40,28,14,.92);
+      color: #fdf6e8;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px;
+      padding: 14px 24px;
+      border-radius: 16px;
+      width: max-content;
+      max-width: min(300px, 86vw);
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .4s ease, transform .4s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,.3);
+    }
+    .gr-mirror-popup.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ══ GIFTBOX EMPTY POPUP ══ */
+    .gr-giftbox-popup {
+      position: fixed;
+      inset: 0;
+      z-index: 9600;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(20,12,4,0);
+      transition: background .4s ease;
+    }
+    .gr-giftbox-popup.active {
+      display: flex;
+      background: rgba(20,12,4,.55);
+    }
+    .gr-giftbox-popup-card {
+      position: relative;
+      width: min(300px, 86vw);
+      background: linear-gradient(160deg, #fffaf0, #f4ecd8);
+      border-radius: 18px;
+      padding: 30px 24px 26px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,.4);
+      opacity: 0;
+      transform: scale(.8) translateY(20px);
+      transition: opacity .4s cubic-bezier(.2,.9,.3,1.1), transform .4s cubic-bezier(.2,.9,.3,1.1);
+    }
+    .gr-giftbox-popup.active .gr-giftbox-popup-card {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      transition-delay: .1s;
+    }
+    .gr-giftbox-popup-close {
+      position: absolute;
+      top: 10px; right: 10px;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,.06);
+      color: rgba(80,60,30,.6);
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .gr-giftbox-popup-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+    .gr-giftbox-popup-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px;
+      color: rgba(70,50,25,.85);
+      line-height: 1.6;
+    }
+    .gr-giftbox-popup-text span {
+      display: block;
+      margin-top: 6px;
+      font-style: italic;
+      color: #a06628;
     }
 
     /* ══ END S-GIFTROOM CSS ══ */
@@ -3318,141 +3611,261 @@
 
     <!-- THE ROOM -->
     <div class="gr-room-wrap" id="gr-room-wrap">
-      <svg id="gr-room-svg" viewBox="0 0 800 480" xmlns="http://www.w3.org/2000/svg">
+      <svg id="gr-room-svg" viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg">
 
         <!-- ══ BACKGROUND ══ -->
-        <rect x="0" y="0" width="800" height="380" fill="#ece2cf"/>
-        <rect x="0" y="380" width="800" height="100" fill="#d8cab0"/>
-        <rect x="0" y="378" width="800" height="4" fill="#c4b596"/>
+        <rect x="0" y="0" width="1000" height="460" fill="#ece2cf"/>
+        <rect x="0" y="460" width="1000" height="140" fill="#d8cab0"/>
+        <rect x="0" y="458" width="1000" height="4" fill="#c4b596"/>
 
         <!-- Ambient wall shadow -->
-        <rect x="0" y="0" width="800" height="380" fill="url(#gr-wallgrad)" opacity=".5"/>
+        <rect x="0" y="0" width="1000" height="460" fill="url(#gr-wallgrad)" opacity=".5"/>
 
-        <!-- ══ WALL ART (decorative, non-interactive) ══ -->
+        <!-- ══ JENDELA — HOTSPOT ══ -->
+        <g id="gr-hotspot-window" class="gr-hotspot" data-id="window" tabindex="0" role="button" aria-label="Jendela">
+          <rect x="40" y="40" width="150" height="180" rx="4" fill="#7a5a3a"/>
+          <rect x="50" y="50" width="130" height="160" fill="#a8d4e8"/>
+          <!-- sky gradient -->
+          <rect x="50" y="50" width="130" height="160" fill="url(#gr-skygrad)"/>
+          <!-- clouds -->
+          <ellipse cx="85" cy="80" rx="18" ry="9" fill="#fff" opacity=".8"/>
+          <ellipse cx="100" cy="76" rx="14" ry="8" fill="#fff" opacity=".8"/>
+          <ellipse cx="140" cy="100" rx="16" ry="8" fill="#fff" opacity=".7"/>
+          <!-- distant hill -->
+          <path d="M50 180 Q90 150 130 172 T180 160 V210 H50Z" fill="#8aab78" opacity=".85"/>
+          <!-- window cross bars -->
+          <rect x="112" y="50" width="6" height="160" fill="#7a5a3a"/>
+          <rect x="50" y="127" width="130" height="6" fill="#7a5a3a"/>
+          <rect x="44" y="44" width="142" height="172" rx="3" fill="none" stroke="#5c4226" stroke-width="4"/>
+          <circle cx="115" cy="130" r="92" fill="transparent" class="gr-tap-target"/>
+        </g>
+
+        <!-- ══ WALL ART KECIL (decorative, non-interactive) ══ -->
         <g opacity=".9">
-          <rect x="56" y="78" width="92" height="110" rx="3" fill="#fff" opacity=".7"/>
-          <rect x="64" y="86" width="76" height="94" rx="2" fill="#7aa8a8"/>
-          <path d="M70 150 Q90 120 110 145 T132 130" stroke="#a8cdd0" stroke-width="4" fill="none" opacity=".7"/>
-
-          <rect x="178" y="50" width="108" height="150" rx="3" fill="#fff" opacity=".7"/>
-          <rect x="188" y="60" width="88" height="130" rx="2" fill="#b8bd92"/>
-          <path d="M196 150 Q220 100 244 140 T272 110" stroke="#cdd2a8" stroke-width="5" fill="none" opacity=".6"/>
-
-          <rect x="358" y="92" width="58" height="78" rx="3" fill="#fff" opacity=".7"/>
-          <rect x="365" y="99" width="44" height="64" rx="2" fill="#7090a0"/>
+          <rect x="222" y="56" width="74" height="92" rx="3" fill="#fff" opacity=".7"/>
+          <rect x="229" y="63" width="60" height="78" rx="2" fill="#7aa8a8"/>
+          <path d="M236 116 Q252 92 268 112 T286 100" stroke="#a8cdd0" stroke-width="3" fill="none" opacity=".7"/>
         </g>
 
         <!-- ══ JAM DINDING — HADIAH UTAMA ══ -->
         <g id="gr-hotspot-clock" class="gr-hotspot gr-hotspot-main" data-id="clock" tabindex="0" role="button" aria-label="Jam dinding">
-          <circle cx="478" cy="120" r="36" fill="#fff" opacity=".85"/>
-          <circle cx="478" cy="120" r="30" fill="#9a9486" id="gr-clock-face"/>
-          <circle cx="478" cy="120" r="2.4" fill="#3a342a"/>
-          <line x1="478" y1="120" x2="478" y2="102" stroke="#3a342a" stroke-width="2.6" stroke-linecap="round" id="gr-clock-hand-h"/>
-          <line x1="478" y1="120" x2="490" y2="120" stroke="#3a342a" stroke-width="2" stroke-linecap="round" id="gr-clock-hand-m"/>
-          <!-- invisible larger tap target -->
-          <circle cx="478" cy="120" r="46" fill="transparent" class="gr-tap-target"/>
+          <circle cx="370" cy="95" r="34" fill="#fff" opacity=".85"/>
+          <circle cx="370" cy="95" r="28" fill="#9a9486" id="gr-clock-face"/>
+          <circle cx="370" cy="95" r="2.2" fill="#3a342a"/>
+          <line x1="370" y1="95" x2="370" y2="78" stroke="#3a342a" stroke-width="2.4" stroke-linecap="round" id="gr-clock-hand-h"/>
+          <line x1="370" y1="95" x2="381" y2="95" stroke="#3a342a" stroke-width="1.8" stroke-linecap="round" id="gr-clock-hand-m"/>
+          <circle cx="370" cy="95" r="44" fill="transparent" class="gr-tap-target"/>
         </g>
 
-        <!-- ══ HANGING LAMP (decorative) ══ -->
-        <line x1="700" y1="0" x2="700" y2="60" stroke="#5a4a30" stroke-width="2"/>
-        <path d="M668 60 L732 60 L716 96 L684 96 Z" fill="#e0a840"/>
-        <circle cx="700" cy="100" r="5" fill="#fff4d0"/>
+        <!-- ══ GALLERY WALL — 9 FOTO TERSEBAR NATURAL ══ -->
+        <!-- Frame 1: kecil, tilted -->
+        <g class="gr-photo-frame" data-photo="0" transform="rotate(-4 470 70)">
+          <rect x="442" y="44" width="56" height="56" rx="2" fill="#fff" />
+          <rect x="448" y="50" width="44" height="44" rx="1" fill="#ccc"/>
+          <image href="" x="448" y="50" width="44" height="44" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        </g>
+        <!-- Frame 2: medium -->
+        <g class="gr-photo-frame" data-photo="1" transform="rotate(3 555 80)">
+          <rect x="525" y="44" width="64" height="78" rx="2" fill="#fff"/>
+          <rect x="531" y="50" width="52" height="66" rx="1" fill="#ccc"/>
+          <image href="" x="531" y="50" width="52" height="66" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        </g>
+        <!-- Frame 3: small round-ish -->
+        <g class="gr-photo-frame" data-photo="2" transform="rotate(-2 632 60)">
+          <rect x="608" y="38" width="50" height="50" rx="3" fill="#fff"/>
+          <rect x="613" y="43" width="40" height="40" rx="2" fill="#ccc"/>
+          <image href="" x="613" y="43" width="40" height="40" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        </g>
+        <!-- Frame 4: tall medium, lower row -->
+        <g class="gr-photo-frame" data-photo="3" transform="rotate(5 460 175)">
+          <rect x="432" y="138" width="56" height="74" rx="2" fill="#fff"/>
+          <rect x="438" y="144" width="44" height="62" rx="1" fill="#ccc"/>
+          <image href="" x="438" y="144" width="44" height="62" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        </g>
+        <!-- Frame 5: small, lower row -->
+        <g class="gr-photo-frame" data-photo="4" transform="rotate(-5 612 165)">
+          <rect x="584" y="138" width="56" height="56" rx="2" fill="#fff"/>
+          <rect x="590" y="144" width="44" height="44" rx="1" fill="#ccc"/>
+          <image href="" x="590" y="144" width="44" height="44" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        </g>
+        <!-- Frame 6: above sofa right side -->
+        <g class="gr-photo-frame" data-photo="5" transform="rotate(2 730 90)">
+          <rect x="700" y="50" width="60" height="80" rx="2" fill="#fff"/>
+          <rect x="706" y="56" width="48" height="68" rx="1" fill="#ccc"/>
+          <image href="" x="706" y="56" width="48" height="68" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        </g>
+        <!-- Frame 7: top right small -->
+        <g class="gr-photo-frame" data-photo="6" transform="rotate(-3 808 70)">
+          <rect x="782" y="42" width="52" height="52" rx="2" fill="#fff"/>
+          <rect x="788" y="48" width="40" height="40" rx="1" fill="#ccc"/>
+          <image href="" x="788" y="48" width="40" height="40" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        </g>
+        <!-- Frame 8: far right -->
+        <g class="gr-photo-frame" data-photo="7" transform="rotate(4 880 105)">
+          <rect x="850" y="62" width="60" height="76" rx="2" fill="#fff"/>
+          <rect x="856" y="68" width="48" height="64" rx="1" fill="#ccc"/>
+          <image href="" x="856" y="68" width="48" height="64" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        </g>
+        <!-- Frame 9: top right, between 7 and 8 -->
+        <g class="gr-photo-frame" data-photo="8" transform="rotate(-2 745 175)">
+          <rect x="715" y="148" width="58" height="58" rx="2" fill="#fff"/>
+          <rect x="721" y="154" width="46" height="46" rx="1" fill="#ccc"/>
+          <image href="" x="721" y="154" width="46" height="46" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        </g>
 
-        <!-- ══ BOOKSHELF (decorative only, per request — tidak interaktif) ══ -->
+        <!-- ══ FRAME VIDEO BESAR — EYE CATCHING, BERGOYANG ══ -->
+        <g id="gr-video-frame" class="gr-video-frame-group">
+          <g id="gr-video-frame-inner" transform="rotate(0 250 320)">
+            <rect x="178" y="248" width="148" height="148" rx="4" fill="#2a1c10"/>
+            <rect x="186" y="256" width="132" height="132" rx="2" fill="#0a0a14"/>
+            <!-- video poster placeholder: kid silhouette / play icon -->
+            <rect x="190" y="260" width="124" height="124" fill="#15131c"/>
+            <circle cx="252" cy="322" r="26" fill="rgba(255,255,255,.12)"/>
+            <path d="M243 308 L243 336 L268 322Z" fill="#fff" opacity=".9"/>
+            <text x="252" y="372" text-anchor="middle" fill="#f0d060" font-family="Cormorant Garamond, serif" font-size="10" letter-spacing="2">TONTON</text>
+            <circle cx="252" cy="322" r="80" fill="transparent" id="gr-video-frame-tap"/>
+          </g>
+        </g>
+
+        <!-- ══ HANGING LAMP — SATU-SATUNYA LAMPU, HOTSPOT ══ -->
+        <g id="gr-hotspot-lamp" class="gr-hotspot" data-id="lamp" tabindex="0" role="button" aria-label="Lampu">
+          <line x1="930" y1="0" x2="930" y2="60" stroke="#5a4a30" stroke-width="2"/>
+          <path d="M898 60 L962 60 L946 96 L914 96 Z" fill="#e0a840"/>
+          <circle cx="930" cy="100" r="6" fill="#fff4d0" id="gr-lamp-bulb"/>
+          <circle cx="930" cy="100" r="22" fill="#fff4d0" opacity="0" id="gr-lamp-glow"/>
+          <circle cx="930" cy="78" r="42" fill="transparent" class="gr-tap-target"/>
+        </g>
+
+        <!-- ══ BOOKSHELF (decorative only) ══ -->
         <g opacity=".95">
-          <rect x="650" y="160" width="132" height="220" fill="#5a4632" rx="2"/>
-          <rect x="658" y="168" width="116" height="48" fill="#46362770"/>
-          <rect x="658" y="222" width="116" height="48" fill="#46362770"/>
-          <rect x="658" y="276" width="116" height="48" fill="#46362770"/>
-          <rect x="658" y="330" width="116" height="42" fill="#46362770"/>
-          <!-- spines -->
-          <rect x="664" y="172" width="7" height="40" fill="#c0533f"/>
-          <rect x="673" y="172" width="7" height="40" fill="#5c8a6e"/>
-          <rect x="682" y="172" width="6" height="40" fill="#3c6f8a"/>
-          <rect x="690" y="172" width="7" height="40" fill="#d4a23c"/>
-          <rect x="664" y="226" width="6" height="40" fill="#7d5ba0"/>
-          <rect x="672" y="226" width="7" height="40" fill="#c0533f"/>
-          <rect x="681" y="226" width="7" height="40" fill="#5c8a6e"/>
-          <rect x="664" y="280" width="7" height="40" fill="#3c6f8a"/>
-          <rect x="673" y="280" width="6" height="40" fill="#d4a23c"/>
+          <rect x="850" y="200" width="132" height="220" fill="#5a4632" rx="2"/>
+          <rect x="858" y="208" width="116" height="48" fill="#46362770"/>
+          <rect x="858" y="262" width="116" height="48" fill="#46362770"/>
+          <rect x="858" y="316" width="116" height="48" fill="#46362770"/>
+          <rect x="858" y="370" width="116" height="42" fill="#46362770"/>
+          <rect x="864" y="212" width="7" height="40" fill="#c0533f"/>
+          <rect x="873" y="212" width="7" height="40" fill="#5c8a6e"/>
+          <rect x="882" y="212" width="6" height="40" fill="#3c6f8a"/>
+          <rect x="890" y="212" width="7" height="40" fill="#d4a23c"/>
+          <rect x="864" y="266" width="6" height="40" fill="#7d5ba0"/>
+          <rect x="872" y="266" width="7" height="40" fill="#c0533f"/>
+          <rect x="881" y="266" width="7" height="40" fill="#5c8a6e"/>
+          <rect x="864" y="320" width="7" height="40" fill="#3c6f8a"/>
+          <rect x="873" y="320" width="6" height="40" fill="#d4a23c"/>
         </g>
 
-        <!-- ══ TALL PLANT (kiri) — HOTSPOT ══ -->
+        <!-- ══ TALL PLANT (kiri bawah) — HOTSPOT ══ -->
         <g id="gr-hotspot-plant" class="gr-hotspot" data-id="plant" tabindex="0" role="button" aria-label="Tanaman">
-          <rect x="55" y="330" width="46" height="56" rx="4" fill="#6b4a34"/>
-          <rect x="58" y="333" width="40" height="6" fill="#7d5a40"/>
-          <path d="M78 332 C60 310 50 270 56 235 C68 268 78 300 80 332Z" fill="#5d8a52"/>
-          <path d="M78 332 C95 300 108 260 100 222 C85 258 78 298 76 332Z" fill="#6fa05f"/>
-          <path d="M78 332 C70 290 72 250 88 215 C92 252 86 296 80 332Z" fill="#7eb56c"/>
-          <circle cx="78" cy="358" r="56" fill="transparent" class="gr-tap-target"/>
+          <rect x="45" y="410" width="46" height="56" rx="4" fill="#6b4a34"/>
+          <rect x="48" y="413" width="40" height="6" fill="#7d5a40"/>
+          <path d="M68 412 C50 390 40 350 46 315 C58 348 68 380 70 412Z" fill="#5d8a52"/>
+          <path d="M68 412 C85 380 98 340 90 302 C75 338 68 378 66 412Z" fill="#6fa05f"/>
+          <path d="M68 412 C60 370 62 330 78 295 C82 332 76 376 70 412Z" fill="#7eb56c"/>
+          <circle cx="68" cy="438" r="56" fill="transparent" class="gr-tap-target"/>
         </g>
 
-        <!-- ══ FLOOR LAMP (decorative, non-interactive untuk jaga fokus) ══ -->
+        <!-- ══ KOTAK HADIAH — HOTSPOT ══ -->
+        <g id="gr-hotspot-giftbox" class="gr-hotspot" data-id="giftbox" tabindex="0" role="button" aria-label="Kotak Hadiah">
+          <g id="gr-giftbox-lid">
+            <rect x="148" y="392" width="62" height="14" rx="2" fill="#c0533f"/>
+            <rect x="172" y="386" width="14" height="20" fill="#e8c850"/>
+          </g>
+          <rect x="152" y="406" width="54" height="46" rx="2" fill="#d4604a"/>
+          <rect x="173" y="406" width="12" height="46" fill="#e8c850"/>
+          <circle cx="179" cy="429" r="58" fill="transparent" class="gr-tap-target"/>
+        </g>
+
+        <!-- ══ CERMIN BERDIRI (full body, pojok kanan bawah) — HOTSPOT ══ -->
+        <g id="gr-hotspot-mirror" class="gr-hotspot" data-id="mirror" tabindex="0" role="button" aria-label="Cermin">
+          <!-- stand legs -->
+          <line x1="700" y1="556" x2="680" y2="572" stroke="#8a6a44" stroke-width="5" stroke-linecap="round"/>
+          <line x1="760" y1="556" x2="780" y2="572" stroke="#8a6a44" stroke-width="5" stroke-linecap="round"/>
+          <!-- frame -->
+          <rect x="685" y="370" width="90" height="190" rx="44" fill="#a8804c"/>
+          <rect x="693" y="378" width="74" height="174" rx="36" fill="#dfe8ec"/>
+          <rect x="699" y="384" width="62" height="162" rx="30" fill="url(#gr-mirrorgrad)"/>
+          <!-- mirror shine -->
+          <path d="M712 392 Q708 460 718 530" stroke="#fff" stroke-width="6" opacity=".35" fill="none" stroke-linecap="round"/>
+          <circle cx="730" cy="465" r="78" fill="transparent" class="gr-tap-target"/>
+        </g>
+
+        <!-- ══ HANGING LAMP — DIHAPUS (cukup 1 lampu saja, sudah di atas) ══ -->
+
+        <!-- ══ FLOOR LAMP (decorative saja, bukan hotspot — sesuai "lampu cukup 1") ══ -->
         <g opacity=".95">
-          <path d="M168 230 L210 230 L196 270 L182 270 Z" fill="#e0a840"/>
-          <ellipse cx="189" cy="232" rx="4" ry="3" fill="#fff4d0"/>
-          <line x1="189" y1="270" x2="189" y2="372" stroke="#7a5a34" stroke-width="3"/>
-          <line x1="189" y1="372" x2="160" y2="386" stroke="#7a5a34" stroke-width="3"/>
-          <line x1="189" y1="372" x2="218" y2="386" stroke="#7a5a34" stroke-width="3"/>
+          <path d="M168 310 L210 310 L196 350 L182 350 Z" fill="#cdbfa8"/>
+          <ellipse cx="189" cy="312" rx="4" ry="3" fill="#f4efe2"/>
+          <line x1="189" y1="350" x2="189" y2="452" stroke="#7a5a34" stroke-width="3"/>
+          <line x1="189" y1="452" x2="160" y2="466" stroke="#7a5a34" stroke-width="3"/>
+          <line x1="189" y1="452" x2="218" y2="466" stroke="#7a5a34" stroke-width="3"/>
         </g>
 
         <!-- ══ SIDE TABLE + BUKU — HOTSPOT (buku) ══ -->
-        <rect x="232" y="340" width="92" height="8" fill="#8a6a48"/>
-        <rect x="240" y="348" width="8" height="38" fill="#7a5a3c"/>
-        <rect x="308" y="348" width="8" height="38" fill="#7a5a3c"/>
+        <rect x="232" y="420" width="92" height="8" fill="#8a6a48"/>
+        <rect x="240" y="428" width="8" height="38" fill="#7a5a3c"/>
+        <rect x="308" y="428" width="8" height="38" fill="#7a5a3c"/>
         <g id="gr-hotspot-book" class="gr-hotspot" data-id="book" tabindex="0" role="button" aria-label="Buku">
-          <rect x="246" y="320" width="48" height="9" rx="1.5" fill="#e8e2d4"/>
-          <rect x="246" y="320" width="48" height="3" fill="#c0533f"/>
-          <rect x="250" y="306" width="42" height="9" rx="1.5" fill="#dcd6c6"/>
-          <rect x="250" y="306" width="42" height="3" fill="#3c6f8a"/>
-          <circle cx="270" cy="318" r="36" fill="transparent" class="gr-tap-target"/>
+          <rect x="246" y="400" width="48" height="9" rx="1.5" fill="#e8e2d4"/>
+          <rect x="246" y="400" width="48" height="3" fill="#c0533f"/>
+          <rect x="250" y="386" width="42" height="9" rx="1.5" fill="#dcd6c6"/>
+          <rect x="250" y="386" width="42" height="3" fill="#3c6f8a"/>
+          <circle cx="270" cy="398" r="36" fill="transparent" class="gr-tap-target"/>
         </g>
 
         <!-- ══ TUMBLER — HOTSPOT ══ -->
         <g id="gr-hotspot-tumbler" class="gr-hotspot" data-id="tumbler" tabindex="0" role="button" aria-label="Tumbler">
-          <rect x="300" y="300" width="16" height="26" rx="4" fill="#c9956a"/>
-          <rect x="300" y="300" width="16" height="6" rx="3" fill="#a87850"/>
-          <circle cx="308" cy="297" r="4" fill="#8a6038"/>
-          <circle cx="308" cy="313" r="30" fill="transparent" class="gr-tap-target"/>
+          <rect x="300" y="380" width="16" height="26" rx="4" fill="#c9956a"/>
+          <rect x="300" y="380" width="16" height="6" rx="3" fill="#a87850"/>
+          <circle cx="308" cy="377" r="4" fill="#8a6038"/>
+          <circle cx="308" cy="393" r="30" fill="transparent" class="gr-tap-target"/>
         </g>
 
         <!-- ══ SOFA — HOTSPOT ══ -->
         <g id="gr-hotspot-sofa" class="gr-hotspot" data-id="sofa" tabindex="0" role="button" aria-label="Sofa">
-          <rect x="368" y="260" width="320" height="100" rx="14" fill="#9b958a"/>
-          <rect x="368" y="230" width="320" height="60" rx="18" fill="#a8a296"/>
-          <rect x="356" y="250" width="30" height="92" rx="12" fill="#8e887c"/>
-          <rect x="686" y="250" width="30" height="92" rx="12" fill="#8e887c"/>
-          <rect x="368" y="334" width="320" height="22" rx="6" fill="#7d776c"/>
-          <rect x="392" y="356" width="12" height="22" rx="3" fill="#a87c4c"/>
-          <rect x="652" y="356" width="12" height="22" rx="3" fill="#a87c4c"/>
-          <circle cx="528" cy="300" r="120" fill="transparent" class="gr-tap-target"/>
+          <rect x="368" y="340" width="320" height="100" rx="14" fill="#9b958a"/>
+          <rect x="368" y="310" width="320" height="60" rx="18" fill="#a8a296"/>
+          <rect x="356" y="330" width="30" height="92" rx="12" fill="#8e887c"/>
+          <rect x="686" y="330" width="30" height="92" rx="12" fill="#8e887c"/>
+          <rect x="368" y="414" width="320" height="22" rx="6" fill="#7d776c"/>
+          <rect x="392" y="436" width="12" height="22" rx="3" fill="#a87c4c"/>
+          <rect x="652" y="436" width="12" height="22" rx="3" fill="#a87c4c"/>
+          <circle cx="528" cy="380" r="120" fill="transparent" class="gr-tap-target"/>
         </g>
 
         <!-- ══ BANTAL ORANGE — HOTSPOT ══ -->
         <g id="gr-hotspot-pillow-o" class="gr-hotspot" data-id="pillow-o" tabindex="0" role="button" aria-label="Bantal oranye">
-          <rect x="404" y="266" width="78" height="62" rx="10" fill="#e0a850" transform="rotate(-6 443 297)"/>
-          <line x1="412" y1="280" x2="460" y2="320" stroke="#fff" stroke-width="5" opacity=".5" transform="rotate(-6 443 297)"/>
-          <line x1="424" y1="272" x2="472" y2="312" stroke="#fff" stroke-width="5" opacity=".5" transform="rotate(-6 443 297)"/>
-          <circle cx="443" cy="297" r="48" fill="transparent" class="gr-tap-target"/>
+          <rect x="404" y="346" width="78" height="62" rx="10" fill="#e0a850" transform="rotate(-6 443 377)"/>
+          <line x1="412" y1="360" x2="460" y2="400" stroke="#fff" stroke-width="5" opacity=".5" transform="rotate(-6 443 377)"/>
+          <line x1="424" y1="352" x2="472" y2="392" stroke="#fff" stroke-width="5" opacity=".5" transform="rotate(-6 443 377)"/>
+          <circle cx="443" cy="377" r="48" fill="transparent" class="gr-tap-target"/>
         </g>
 
         <!-- ══ BANTAL HIJAU — HOTSPOT ══ -->
         <g id="gr-hotspot-pillow-g" class="gr-hotspot" data-id="pillow-g" tabindex="0" role="button" aria-label="Bantal hijau">
-          <rect x="586" y="266" width="78" height="62" rx="10" fill="#7ea868" transform="rotate(6 625 297)"/>
-          <line x1="594" y1="280" x2="642" y2="320" stroke="#fff" stroke-width="5" opacity=".5" transform="rotate(6 625 297)"/>
-          <line x1="606" y1="272" x2="654" y2="312" stroke="#fff" stroke-width="5" opacity=".5" transform="rotate(6 625 297)"/>
-          <circle cx="625" cy="297" r="48" fill="transparent" class="gr-tap-target"/>
+          <rect x="586" y="346" width="78" height="62" rx="10" fill="#7ea868" transform="rotate(6 625 377)"/>
+          <line x1="594" y1="360" x2="642" y2="400" stroke="#fff" stroke-width="5" opacity=".5" transform="rotate(6 625 377)"/>
+          <line x1="606" y1="352" x2="654" y2="392" stroke="#fff" stroke-width="5" opacity=".5" transform="rotate(6 625 377)"/>
+          <circle cx="625" cy="377" r="48" fill="transparent" class="gr-tap-target"/>
         </g>
 
         <!-- ══ RUG (decorative) ══ -->
-        <ellipse cx="528" cy="410" rx="220" ry="36" fill="#f4efe2" opacity=".75"/>
-        <ellipse cx="528" cy="410" rx="220" ry="36" fill="none" stroke="#d8cfb8" stroke-width="2"/>
+        <ellipse cx="528" cy="490" rx="220" ry="36" fill="#f4efe2" opacity=".75"/>
+        <ellipse cx="528" cy="490" rx="220" ry="36" fill="none" stroke="#d8cfb8" stroke-width="2"/>
 
         <!-- ══ DEFS ══ -->
         <defs>
           <linearGradient id="gr-wallgrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="#fff" stop-opacity=".3"/>
             <stop offset="100%" stop-color="#000" stop-opacity=".05"/>
+          </linearGradient>
+          <linearGradient id="gr-skygrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#bfe3f0"/>
+            <stop offset="100%" stop-color="#e8f4ec"/>
+          </linearGradient>
+          <linearGradient id="gr-mirrorgrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#dceef2"/>
+            <stop offset="50%" stop-color="#b8d4dc"/>
+            <stop offset="100%" stop-color="#9cc0cc"/>
           </linearGradient>
         </defs>
       </svg>
@@ -3462,6 +3875,45 @@
 
       <!-- Sparkle/particle layer -->
       <div id="gr-particles"></div>
+
+      <!-- Camera feed for mirror (hidden until activated) -->
+      <div id="gr-mirror-cam-wrap" class="gr-mirror-cam-wrap">
+        <video id="gr-mirror-cam" autoplay playsinline muted></video>
+      </div>
+    </div>
+
+    <!-- ══ FULLSCREEN VIDEO PLAYER (untuk frame video di dinding) ══ -->
+    <div id="gr-video-fullscreen" class="gr-video-fullscreen">
+      <div class="gr-vfs-frame-wrap">
+        <div class="gr-vfs-frame-outer">
+          <div class="gr-vfs-frame-inner">
+            <div class="gr-vfs-canvas">
+              <video id="gr-vfs-video" playsinline preload="auto"></video>
+              <div class="gr-vfs-glitch-r"></div>
+              <div class="gr-vfs-glitch-b"></div>
+              <canvas id="gr-vfs-grain"></canvas>
+              <div class="gr-vfs-loading" id="gr-vfs-loading">
+                <div class="gr-vfs-spinner"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="gr-vfs-close" id="gr-vfs-close" aria-label="Tutup video">✕</button>
+    </div>
+
+    <!-- Box gift box empty reveal popup -->
+    <div id="gr-giftbox-popup" class="gr-giftbox-popup">
+      <div class="gr-giftbox-popup-card">
+        <button class="gr-giftbox-popup-close" id="gr-giftbox-popup-close">✕</button>
+        <div class="gr-giftbox-popup-icon">📦</div>
+        <p class="gr-giftbox-popup-text">Yah, kosong. Mirip dompet papa setelah belanja buat ayang 💸<br><span>eh maksudnya — yang isi cuma hati papa sama kamu ❤️</span></p>
+      </div>
+    </div>
+
+    <!-- Mirror message popup -->
+    <div id="gr-mirror-popup" class="gr-mirror-popup">
+      <p>Coba lihat baik-baik... ada orang spesial sedang menatap balik ke arahmu 🪞✨</p>
     </div>
 
     <!-- ══ WATCH REVEAL MODAL ══ -->
@@ -5486,7 +5938,7 @@
         'tumbler':  'Kamu mau ini? aku bisa sulap nanti kalo kamu mau ini 🥤'
       };
 
-      const TOTAL_NON_CLOCK = Object.keys(MESSAGES).length;
+      const TOTAL_NON_CLOCK = Object.keys(MESSAGES).length + 4; // +window, lamp, giftbox, mirror
       document.getElementById('gr-progress-total').textContent = TOTAL_NON_CLOCK;
 
       const found = new Set();
@@ -5507,7 +5959,31 @@
         tooltip.textContent = text;
         tooltip.style.left = x + 'px';
         tooltip.style.top  = Math.max(y, 30) + 'px';
+        // Reset shift before measuring natural size
+        tooltip.style.setProperty('--tip-shift', '0px');
         tooltip.classList.add('show');
+
+        // ── Clamp horizontally so tooltip never overflows room/viewport ──
+        // Measure after it's shown (display via opacity, but width/height already computable since width:max-content)
+        requestAnimationFrame(() => {
+          const tw = tooltip.offsetWidth;
+          const halfW = tw / 2;
+          const margin = 10; // px breathing room from edges
+          const roomW = roomRect.width;
+
+          // Tooltip's natural left/right edge (centered on x, before shift)
+          let shift = 0;
+          const naturalLeft  = x - halfW;
+          const naturalRight = x + halfW;
+
+          if (naturalLeft < margin) {
+            shift = margin - naturalLeft; // push right
+          } else if (naturalRight > roomW - margin) {
+            shift = (roomW - margin) - naturalRight; // push left
+          }
+
+          tooltip.style.setProperty('--tip-shift', shift + 'px');
+        });
 
         clearTimeout(tooltip._hideTimer);
         tooltip._hideTimer = setTimeout(() => {
@@ -5641,10 +6117,279 @@
         let angle = 0;
         function frame() {
           angle += 0.15;
-          minHand.setAttribute('transform', `rotate(${angle % 360} 478 120)`);
+          minHand.setAttribute('transform', `rotate(${angle % 360} 370 95)`);
           requestAnimationFrame(frame);
         }
         frame();
+      })();
+
+      // ── PHOTO IDs for gallery wall (9 foto, Google Drive lh3 format) ──
+      const GR_PHOTO_IDS = [
+        '1hnVb15-U7cZCd6rg4ZV7Vs8N3gaztWWS',
+        '1CX7WyTt9qr4nI9G9g6hoZM45UP-HAPsu',
+        '19hAT93IkD3JhQxkuNQXs7yHzJdX0Kou5',
+        '1-DTFu1gqVuo_I5atQWxrfYtbtfhQMyIe',
+        '1gaCZRjIcn8VKGzGwb_XoWO1HJQdvpAGW',
+        '1kLykZk0SH6eNjRrKqBgdEG9MErkeitoS',
+        '1dpJfrYw9y5h8eBeR5zmweM_eo2k2t5lc',
+        '1Kfwx7dEKE-nlOIOYwExkb7MXvd7mCb6L',
+        '12ZkhotXhTfC3Q95npkXEFnMDKHbgFkWT'
+      ];
+      document.querySelectorAll('.gr-photo-img').forEach((img, idx) => {
+        const id = GR_PHOTO_IDS[idx];
+        if (id) img.setAttribute('href', `https://lh3.googleusercontent.com/d/${id}`);
+      });
+
+      // ── JENDELA hotspot ──
+      const windowEl = document.getElementById('gr-hotspot-window');
+      if (windowEl) {
+        function triggerWindow(e) {
+          e.preventDefault();
+          if (cooldown.has('window')) return;
+          cooldown.add('window');
+          setTimeout(() => cooldown.delete('window'), 350);
+          handleHotspotClick(windowEl, 'window-custom');
+          showTooltip(windowEl, 'Pemandangannya bagus, tapi papa lebih suka memandangmu 🪟');
+          if (!found.has('window')) { found.add('window'); bumpProgress(); }
+        }
+        windowEl.addEventListener('click', triggerWindow);
+        windowEl.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') triggerWindow(e); });
+      }
+
+      // ── LAMPU hotspot (1 saja) ──
+      const lampEl = document.getElementById('gr-hotspot-lamp');
+      if (lampEl) {
+        let lampLit = false;
+        function triggerLamp(e) {
+          e.preventDefault();
+          if (cooldown.has('lamp')) return;
+          cooldown.add('lamp');
+          setTimeout(() => cooldown.delete('lamp'), 350);
+
+          lampLit = !lampLit;
+          lampEl.classList.toggle('gr-lamp-lit', lampLit);
+
+          handleHotspotClick(lampEl, 'lamp-custom');
+          showTooltip(lampEl, 'Dinyalakan berkali-kali tetap biasa saja. Yang bikin hidup papa terang ya kamu 🌟');
+          if (!found.has('lamp')) { found.add('lamp'); bumpProgress(); }
+        }
+        lampEl.addEventListener('click', triggerLamp);
+        lampEl.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') triggerLamp(e); });
+      }
+
+      // ── KOTAK HADIAH hotspot — terbuka, kosong ──
+      const giftboxEl = document.getElementById('gr-hotspot-giftbox');
+      const giftboxPopup = document.getElementById('gr-giftbox-popup');
+      const giftboxPopupClose = document.getElementById('gr-giftbox-popup-close');
+      if (giftboxEl) {
+        function triggerGiftbox(e) {
+          e.preventDefault();
+          if (cooldown.has('giftbox')) return;
+          cooldown.add('giftbox');
+          setTimeout(() => cooldown.delete('giftbox'), 600);
+
+          giftboxEl.classList.add('gr-giftbox-opened');
+          burstSparkles(giftboxEl);
+
+          if (!found.has('giftbox')) { found.add('giftbox'); bumpProgress(); }
+
+          setTimeout(() => {
+            giftboxPopup.classList.add('active');
+          }, 350);
+
+          setTimeout(() => {
+            giftboxEl.classList.remove('gr-giftbox-opened');
+          }, 1400);
+        }
+        giftboxEl.addEventListener('click', triggerGiftbox);
+        giftboxEl.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') triggerGiftbox(e); });
+      }
+      giftboxPopupClose && giftboxPopupClose.addEventListener('click', () => {
+        giftboxPopup.classList.remove('active');
+      });
+      giftboxPopup && giftboxPopup.addEventListener('click', e => {
+        if (e.target === giftboxPopup) giftboxPopup.classList.remove('active');
+      });
+
+      // ── CERMIN hotspot — aktifkan kamera depan ──
+      const mirrorEl = document.getElementById('gr-hotspot-mirror');
+      const mirrorCamWrap = document.getElementById('gr-mirror-cam-wrap');
+      const mirrorCamVideo = document.getElementById('gr-mirror-cam');
+      const mirrorPopup = document.getElementById('gr-mirror-popup');
+      let mirrorStream = null;
+      let mirrorActive = false;
+
+      function positionMirrorCam() {
+        // Posisikan cam-wrap tepat di area kaca cermin (koordinat SVG → px container)
+        const svgEl = document.getElementById('gr-room-svg');
+        const roomRect = room.getBoundingClientRect();
+        const vb = svgEl.viewBox.baseVal;
+        const scale = roomRect.width / vb.width;
+
+        // koordinat kaca cermin dalam SVG: x=699,y=384,w=62,h=162 (rx=30 → bulat lonjong)
+        const mx = 699 * scale, my = 384 * scale;
+        const mw = 62 * scale, mh = 162 * scale;
+        mirrorCamWrap.style.left = mx + 'px';
+        mirrorCamWrap.style.top  = my + 'px';
+        mirrorCamWrap.style.width  = mw + 'px';
+        mirrorCamWrap.style.height = mh + 'px';
+        mirrorCamWrap.style.borderRadius = (30 * scale) + 'px';
+      }
+
+      async function triggerMirror(e) {
+        e.preventDefault();
+        if (cooldown.has('mirror')) return;
+        cooldown.add('mirror');
+        setTimeout(() => cooldown.delete('mirror'), 600);
+
+        handleHotspotClick(mirrorEl, 'mirror-custom');
+
+        if (!found.has('mirror')) { found.add('mirror'); bumpProgress(); }
+
+        if (mirrorActive) {
+          // Toggle off jika sudah aktif
+          if (mirrorStream) {
+            mirrorStream.getTracks().forEach(t => t.stop());
+            mirrorStream = null;
+          }
+          mirrorCamWrap.classList.remove('active');
+          mirrorActive = false;
+          mirrorPopup.classList.remove('show');
+          return;
+        }
+
+        try {
+          mirrorStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'user' }, audio: false
+          });
+          mirrorCamVideo.srcObject = mirrorStream;
+          positionMirrorCam();
+          mirrorCamWrap.classList.add('active');
+          mirrorActive = true;
+
+          mirrorPopup.textContent = 'Coba lihat baik-baik... ada orang spesial sedang menatap balik ke arahmu 🪞✨';
+          mirrorPopup.classList.add('show');
+          clearTimeout(mirrorPopup._hideTimer);
+          mirrorPopup._hideTimer = setTimeout(() => mirrorPopup.classList.remove('show'), 3500);
+        } catch (err) {
+          // Kamera tidak tersedia / izin ditolak — tetap tampilkan pesannya saja
+          mirrorPopup.textContent = 'Coba lihat baik-baik... ada orang spesial sedang menatap balik ke arahmu 🪞✨';
+          mirrorPopup.classList.add('show');
+          clearTimeout(mirrorPopup._hideTimer);
+          mirrorPopup._hideTimer = setTimeout(() => mirrorPopup.classList.remove('show'), 3500);
+        }
+      }
+      mirrorEl && mirrorEl.addEventListener('click', triggerMirror);
+      mirrorEl && mirrorEl.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') triggerMirror(e); });
+      window.addEventListener('resize', () => { if (mirrorActive) positionMirrorCam(); });
+
+      // ── VIDEO FRAME DI DINDING — fullscreen player, mekanisme sama seperti S-video ──
+      (function () {
+        const VC_SRC = 'https://raw.githubusercontent.com/ryantrisyardi-glitch/BerbulanBulan-AkuRahasiakanIni/main/KicauMania-Kaafi.mp4';
+        const frameTap = document.getElementById('gr-video-frame-tap');
+        const fsWrap   = document.getElementById('gr-video-fullscreen');
+        const fsVideo  = document.getElementById('gr-vfs-video');
+        const fsCanvas = document.querySelector('.gr-vfs-canvas');
+        const fsClose  = document.getElementById('gr-vfs-close');
+        const fsLoading= document.getElementById('gr-vfs-loading');
+        const fsGrain  = document.getElementById('gr-vfs-grain');
+
+        if (!frameTap || !fsWrap || !fsVideo) return;
+
+        let grainActive = false;
+        // Film grain for fullscreen video
+        if (fsGrain) {
+          const gctx = fsGrain.getContext('2d');
+          function resizeGrain() {
+            fsGrain.width  = fsCanvas.offsetWidth  || 320;
+            fsGrain.height = fsCanvas.offsetHeight || 568;
+          }
+          resizeGrain();
+          window.addEventListener('resize', () => setTimeout(resizeGrain, 100));
+          function drawGrain() {
+            if (!grainActive) return;
+            const w = fsGrain.width, h = fsGrain.height;
+            const id = gctx.createImageData(w, h);
+            for (let i = 0; i < id.data.length; i += 4) {
+              const v = Math.random() * 255 | 0;
+              id.data[i] = id.data[i+1] = id.data[i+2] = v;
+              id.data[i+3] = 20;
+            }
+            gctx.putImageData(id, 0, 0);
+            setTimeout(() => requestAnimationFrame(drawGrain), 50);
+          }
+          window._grVideoFrameDrawGrain = drawGrain;
+        }
+
+        function vfsGlitch(n) {
+          let i = 0;
+          (function next() {
+            fsCanvas.classList.add('glitch');
+            setTimeout(() => {
+              fsCanvas.classList.remove('glitch');
+              if (++i < n) setTimeout(next, 150 + Math.random()*100);
+            }, 140 + Math.random()*70);
+          })();
+        }
+
+        function openVideoFrame() {
+          fsWrap.classList.add('active');
+          fsLoading.classList.add('show');
+
+          fsVideo.src = VC_SRC;
+          fsVideo.muted = false;
+          fsVideo.load();
+
+          fsVideo.onloadeddata = () => {
+            fsLoading.classList.remove('show');
+            fsVideo.play().catch(()=>{});
+            vfsGlitch(3);
+          };
+
+          grainActive = true;
+          if (window._grVideoFrameDrawGrain) window._grVideoFrameDrawGrain();
+
+          // Duck Hadirmu.mp3 volume — sama seperti video sebelumnya
+          if (typeof gainNode !== 'undefined' && gainNode && typeof audioCtx !== 'undefined' && audioCtx) {
+            gainNode.gain.setTargetAtTime(0.08, audioCtx.currentTime, 0.6);
+          }
+        }
+
+        function closeVideoFrame() {
+          fsWrap.classList.remove('active');
+          fsVideo.pause();
+          fsVideo.currentTime = 0;
+          grainActive = false;
+
+          // Restore Hadirmu.mp3 volume
+          if (typeof gainNode !== 'undefined' && gainNode && typeof audioCtx !== 'undefined' && audioCtx
+              && typeof musicOn !== 'undefined' && musicOn) {
+            gainNode.gain.setTargetAtTime(0.45, audioCtx.currentTime, 0.8);
+          }
+        }
+
+        // Video selesai → otomatis kembali ke frame (sesuai request)
+        fsVideo.addEventListener('ended', () => {
+          vfsGlitch(2);
+          setTimeout(closeVideoFrame, 250);
+        });
+
+        // Tap area di frame dinding → buka fullscreen
+        frameTap.addEventListener('click', e => {
+          e.preventDefault();
+          openVideoFrame();
+        });
+
+        // Close button
+        fsClose.addEventListener('click', e => {
+          e.preventDefault();
+          closeVideoFrame();
+        });
+
+        // Klik backdrop di luar frame video → tutup juga
+        fsWrap.addEventListener('click', e => {
+          if (e.target === fsWrap) closeVideoFrame();
+        });
       })();
 
     })();
