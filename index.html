@@ -1552,41 +1552,131 @@
 
     /* ══ PHOTO FRAMES ON WALL ══ */
     .gr-photo-frame {
-      cursor: default;
+      cursor: pointer;
+      transition: filter .2s ease;
+      transform-box: fill-box;
+      transform-origin: center;
     }
     .gr-photo-img {
-      cursor: default;
-    }
-
-    /* ══ VIDEO FRAME — EYE CATCHING, WIGGLES ══ */
-    .gr-video-frame-group {
       cursor: pointer;
     }
-    @keyframes gr-video-frame-wiggle {
-      0%   { transform: rotate(0deg); }
-      15%  { transform: rotate(-2.2deg); }
-      30%  { transform: rotate(1.8deg); }
-      45%  { transform: rotate(-1.6deg); }
-      60%  { transform: rotate(1.2deg); }
-      75%  { transform: rotate(-0.8deg); }
-      90%  { transform: rotate(0.4deg); }
-      100% { transform: rotate(0deg); }
+    .gr-photo-frame:hover {
+      filter: brightness(1.08);
     }
-    #gr-video-frame-inner {
-      transform-origin: 252px 322px;
-      transform-box: fill-box;
-      animation: gr-video-frame-wiggle 3.6s ease-in-out infinite;
+    /* Sembunyikan sumber/anchor selagi belum diukur JS (hindari flash foto ter-crop sesaat) */
+    .gr-photo-frame.gr-pf-pending {
+      opacity: 0;
+    }
+    .gr-photo-frame.gr-pf-ready {
+      opacity: 1;
+      transition: opacity .35s ease, filter .2s ease;
+    }
+    /* Sembunyikan frame asal saat sedang di-zoom (foto ditampilkan di overlay) */
+    .gr-photo-frame.gr-pf-zooming {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ══ PHOTO ZOOM OVERLAY (FLIP technique: animasi dari posisi asli ke tengah layar) ══ */
+    #gr-photo-zoom-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9800;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10,6,2,0);
+      transition: background .4s ease;
+    }
+    #gr-photo-zoom-overlay.active {
+      display: flex;
+      background: rgba(10,6,2,.86);
+    }
+    #gr-photo-zoom-img-wrap {
+      position: fixed;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,.3), 0 30px 80px rgba(0,0,0,.5);
+      background: #ccc;
+      /* posisi & ukuran awal di-set via JS (sama dengan frame asli),
+         lalu di-animate ke posisi tengah membesar */
+      transition: left .55s cubic-bezier(.2,.9,.2,1.05),
+                  top .55s cubic-bezier(.2,.9,.2,1.05),
+                  width .55s cubic-bezier(.2,.9,.2,1.05),
+                  height .55s cubic-bezier(.2,.9,.2,1.05),
+                  border-radius .55s ease;
+    }
+    #gr-photo-zoom-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    #gr-photo-zoom-hint {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12px;
+      letter-spacing: .2em;
+      color: rgba(255,250,235,.7);
+      opacity: 0;
+      transition: opacity .4s ease;
+      z-index: 9801;
+      pointer-events: none;
+    }
+    #gr-photo-zoom-overlay.active #gr-photo-zoom-hint {
+      opacity: 1;
+      transition-delay: .3s;
+    }
+
+    /* ══ TV — EYE CATCHING, LAYAR GLITCH HITAM + TANDA "?" ══ */
+    .gr-video-frame-group {
+      cursor: pointer;
     }
     #gr-video-frame-tap {
       cursor: pointer;
     }
-    /* subtle glow pulse to hint it's special */
-    @keyframes gr-video-frame-glow {
+
+    /* TV body sedikit glow untuk menarik perhatian, halus tidak berlebihan */
+    @keyframes gr-tv-ambient-glow {
       0%, 100% { filter: drop-shadow(0 0 0px rgba(240,208,96,0)); }
-      50%      { filter: drop-shadow(0 0 10px rgba(240,208,96,.55)); }
+      50%      { filter: drop-shadow(0 0 8px rgba(240,208,96,.4)); }
     }
     .gr-video-frame-group {
-      animation: gr-video-frame-glow 3.6s ease-in-out infinite;
+      animation: gr-tv-ambient-glow 3.6s ease-in-out infinite;
+    }
+
+    /* Layar TV: glitch background hitam berkedip-kedip dengan noise bands */
+    #gr-tv-screen-content {
+      animation: gr-tv-flicker 2.6s steps(1) infinite;
+    }
+    @keyframes gr-tv-flicker {
+      0%, 100% { opacity: 1; }
+      4%       { opacity: .55; }
+      6%       { opacity: 1; }
+      38%      { opacity: .7; }
+      40%      { opacity: 1; }
+      71%      { opacity: .6; }
+      73%      { opacity: 1; }
+    }
+
+    /* Tanda tanya "?" berkedip pelan, seperti sinyal misterius */
+    #gr-tv-qmark {
+      animation: gr-tv-qmark-pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes gr-tv-qmark-pulse {
+      0%, 100% { opacity: .85; }
+      50%      { opacity: .35; }
+    }
+
+    /* Noise/glitch bar overlay di layar TV, dipicu via class saat random interval (JS) */
+    .gr-tv-glitch-bar {
+      position: absolute;
+      pointer-events: none;
+      background: rgba(255,255,255,.08);
+      mix-blend-mode: screen;
     }
 
     /* ══ LAMP GLOW ON CLICK ══ */
@@ -3724,28 +3814,36 @@
         <rect x="0" y="0" width="1000" height="460" fill="url(#gr-wallgrad)" opacity=".5"/>
 
         <!-- ══ JENDELA — HOTSPOT ══ -->
-        <g id="gr-hotspot-window" class="gr-hotspot" data-id="window" tabindex="0" role="button" aria-label="Jendela">
-          <rect x="40" y="40" width="150" height="180" rx="4" fill="#7a5a3a"/>
-          <rect x="50" y="50" width="130" height="160" fill="#a8d4e8"/>
-          <!-- sky gradient -->
+        <g id="gr-hotspot-window" class="gr-hotspot" data-id="window" data-anchor-x="115" data-anchor-y="130" tabindex="0" role="button" aria-label="Jendela">
+          <rect x="40" y="40" width="150" height="180" rx="4" fill="#3a3050"/>
+          <rect x="50" y="50" width="130" height="160" fill="#1a1838"/>
+          <!-- night sky gradient -->
           <rect x="50" y="50" width="130" height="160" fill="url(#gr-skygrad)"/>
-          <!-- clouds -->
-          <ellipse cx="85" cy="80" rx="18" ry="9" fill="#fff" opacity=".8"/>
-          <ellipse cx="100" cy="76" rx="14" ry="8" fill="#fff" opacity=".8"/>
-          <ellipse cx="140" cy="100" rx="16" ry="8" fill="#fff" opacity=".7"/>
-          <!-- distant hill -->
-          <path d="M50 180 Q90 150 130 172 T180 160 V210 H50Z" fill="#8aab78" opacity=".85"/>
+          <!-- stars -->
+          <circle cx="70" cy="68" r="1.4" fill="#fff" opacity=".9"/>
+          <circle cx="95" cy="60" r="1" fill="#fff" opacity=".7"/>
+          <circle cx="130" cy="72" r="1.3" fill="#fff" opacity=".85"/>
+          <circle cx="155" cy="65" r="1" fill="#fff" opacity=".6"/>
+          <circle cx="78" cy="95" r="1" fill="#fff" opacity=".7"/>
+          <circle cx="148" cy="92" r="1.2" fill="#fff" opacity=".8"/>
+          <circle cx="110" cy="58" r="1" fill="#fff" opacity=".65"/>
+          <circle cx="62" cy="110" r="1" fill="#fff" opacity=".55"/>
+          <!-- moon -->
+          <circle cx="148" cy="78" r="14" fill="#f4ecd0" opacity=".95"/>
+          <circle cx="152" cy="74" r="11" fill="#1a1838" opacity=".35"/>
+          <!-- distant hill silhouette (night) -->
+          <path d="M50 180 Q90 150 130 172 T180 160 V210 H50Z" fill="#16142a" opacity=".9"/>
           <!-- window cross bars -->
-          <rect x="112" y="50" width="6" height="160" fill="#7a5a3a"/>
-          <rect x="50" y="127" width="130" height="6" fill="#7a5a3a"/>
-          <rect x="44" y="44" width="142" height="172" rx="3" fill="none" stroke="#5c4226" stroke-width="4"/>
+          <rect x="112" y="50" width="6" height="160" fill="#3a3050"/>
+          <rect x="50" y="127" width="130" height="6" fill="#3a3050"/>
+          <rect x="44" y="44" width="142" height="172" rx="3" fill="none" stroke="#241f3c" stroke-width="4"/>
           <circle cx="115" cy="130" r="92" fill="transparent" class="gr-tap-target"/>
         </g>
 
         <!-- (Wall art dekoratif dihapus — semua frame di dinding kini berisi foto asli) -->
 
         <!-- ══ JAM DINDING — HADIAH UTAMA, TERSEMBUNYI SAMPAI CUKUP HOTSPOT DITEMUKAN ══ -->
-        <g id="gr-hotspot-clock" class="gr-hotspot gr-hotspot-main gr-clock-hidden" data-id="clock" tabindex="0" role="button" aria-label="Jam dinding">
+        <g id="gr-hotspot-clock" class="gr-hotspot gr-hotspot-main gr-clock-hidden" data-id="clock" data-anchor-x="370" data-anchor-y="95" tabindex="0" role="button" aria-label="Jam dinding">
           <circle cx="370" cy="95" r="34" fill="#fff" opacity=".85"/>
           <circle cx="370" cy="95" r="28" fill="#9a9486" id="gr-clock-face"/>
           <circle cx="370" cy="95" r="2.2" fill="#3a342a"/>
@@ -3756,76 +3854,81 @@
 
         <!-- ══ GALLERY WALL — 9 FOTO TERSEBAR NATURAL ══ -->
         <!-- Frame 1: kecil, tilted -->
-        <g class="gr-photo-frame" data-photo="0" transform="rotate(-4 470 70)">
-          <rect x="442" y="44" width="56" height="56" rx="2" fill="#fff" />
-          <rect x="448" y="50" width="44" height="44" rx="1" fill="#ccc"/>
-          <image href="" x="448" y="50" width="44" height="44" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        <g class="gr-photo-frame" data-photo="0" data-cx="470" data-cy="70" data-max-w="62" data-max-h="62" data-rot="-4">
+          <rect class="gr-pf-border" x="442" y="44" width="56" height="56" rx="2" fill="#fff"/>
+          <rect class="gr-pf-bg"     x="448" y="50" width="44" height="44" rx="1" fill="#ccc"/>
+          <image class="gr-photo-img" href="" x="448" y="50" width="44" height="44" preserveAspectRatio="xMidYMid slice"/>
         </g>
         <!-- Frame 2: medium -->
-        <g class="gr-photo-frame" data-photo="1" transform="rotate(3 555 80)">
-          <rect x="525" y="44" width="64" height="78" rx="2" fill="#fff"/>
-          <rect x="531" y="50" width="52" height="66" rx="1" fill="#ccc"/>
-          <image href="" x="531" y="50" width="52" height="66" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        <g class="gr-photo-frame" data-photo="1" data-cx="555" data-cy="80" data-max-w="70" data-max-h="86" data-rot="3">
+          <rect class="gr-pf-border" x="525" y="44" width="64" height="78" rx="2" fill="#fff"/>
+          <rect class="gr-pf-bg"     x="531" y="50" width="52" height="66" rx="1" fill="#ccc"/>
+          <image class="gr-photo-img" href="" x="531" y="50" width="52" height="66" preserveAspectRatio="xMidYMid slice"/>
         </g>
         <!-- Frame 3: small round-ish -->
-        <g class="gr-photo-frame" data-photo="2" transform="rotate(-2 632 60)">
-          <rect x="608" y="38" width="50" height="50" rx="3" fill="#fff"/>
-          <rect x="613" y="43" width="40" height="40" rx="2" fill="#ccc"/>
-          <image href="" x="613" y="43" width="40" height="40" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        <g class="gr-photo-frame" data-photo="2" data-cx="632" data-cy="60" data-max-w="56" data-max-h="56" data-rot="-2">
+          <rect class="gr-pf-border" x="608" y="38" width="50" height="50" rx="3" fill="#fff"/>
+          <rect class="gr-pf-bg"     x="613" y="43" width="40" height="40" rx="2" fill="#ccc"/>
+          <image class="gr-photo-img" href="" x="613" y="43" width="40" height="40" preserveAspectRatio="xMidYMid slice"/>
         </g>
         <!-- Frame 4: tall medium, lower row -->
-        <g class="gr-photo-frame" data-photo="3" transform="rotate(5 460 175)">
-          <rect x="432" y="138" width="56" height="74" rx="2" fill="#fff"/>
-          <rect x="438" y="144" width="44" height="62" rx="1" fill="#ccc"/>
-          <image href="" x="438" y="144" width="44" height="62" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        <g class="gr-photo-frame" data-photo="3" data-cx="460" data-cy="175" data-max-w="62" data-max-h="82" data-rot="5">
+          <rect class="gr-pf-border" x="432" y="138" width="56" height="74" rx="2" fill="#fff"/>
+          <rect class="gr-pf-bg"     x="438" y="144" width="44" height="62" rx="1" fill="#ccc"/>
+          <image class="gr-photo-img" href="" x="438" y="144" width="44" height="62" preserveAspectRatio="xMidYMid slice"/>
         </g>
         <!-- Frame 5: small, lower row -->
-        <g class="gr-photo-frame" data-photo="4" transform="rotate(-5 612 165)">
-          <rect x="584" y="138" width="56" height="56" rx="2" fill="#fff"/>
-          <rect x="590" y="144" width="44" height="44" rx="1" fill="#ccc"/>
-          <image href="" x="590" y="144" width="44" height="44" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        <g class="gr-photo-frame" data-photo="4" data-cx="612" data-cy="165" data-max-w="62" data-max-h="62" data-rot="-5">
+          <rect class="gr-pf-border" x="584" y="138" width="56" height="56" rx="2" fill="#fff"/>
+          <rect class="gr-pf-bg"     x="590" y="144" width="44" height="44" rx="1" fill="#ccc"/>
+          <image class="gr-photo-img" href="" x="590" y="144" width="44" height="44" preserveAspectRatio="xMidYMid slice"/>
         </g>
         <!-- Frame 6: above sofa right side -->
-        <g class="gr-photo-frame" data-photo="5" transform="rotate(2 730 90)">
-          <rect x="700" y="50" width="60" height="80" rx="2" fill="#fff"/>
-          <rect x="706" y="56" width="48" height="68" rx="1" fill="#ccc"/>
-          <image href="" x="706" y="56" width="48" height="68" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        <g class="gr-photo-frame" data-photo="5" data-cx="730" data-cy="90" data-max-w="66" data-max-h="88" data-rot="2">
+          <rect class="gr-pf-border" x="700" y="50" width="60" height="80" rx="2" fill="#fff"/>
+          <rect class="gr-pf-bg"     x="706" y="56" width="48" height="68" rx="1" fill="#ccc"/>
+          <image class="gr-photo-img" href="" x="706" y="56" width="48" height="68" preserveAspectRatio="xMidYMid slice"/>
         </g>
         <!-- Frame 7: top right small -->
-        <g class="gr-photo-frame" data-photo="6" transform="rotate(-3 808 70)">
-          <rect x="782" y="42" width="52" height="52" rx="2" fill="#fff"/>
-          <rect x="788" y="48" width="40" height="40" rx="1" fill="#ccc"/>
-          <image href="" x="788" y="48" width="40" height="40" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        <g class="gr-photo-frame" data-photo="6" data-cx="808" data-cy="70" data-max-w="58" data-max-h="58" data-rot="-3">
+          <rect class="gr-pf-border" x="782" y="42" width="52" height="52" rx="2" fill="#fff"/>
+          <rect class="gr-pf-bg"     x="788" y="48" width="40" height="40" rx="1" fill="#ccc"/>
+          <image class="gr-photo-img" href="" x="788" y="48" width="40" height="40" preserveAspectRatio="xMidYMid slice"/>
         </g>
         <!-- Frame 8: far right -->
-        <g class="gr-photo-frame" data-photo="7" transform="rotate(4 880 105)">
-          <rect x="850" y="62" width="60" height="76" rx="2" fill="#fff"/>
-          <rect x="856" y="68" width="48" height="64" rx="1" fill="#ccc"/>
-          <image href="" x="856" y="68" width="48" height="64" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        <g class="gr-photo-frame" data-photo="7" data-cx="880" data-cy="105" data-max-w="66" data-max-h="84" data-rot="4">
+          <rect class="gr-pf-border" x="850" y="62" width="60" height="76" rx="2" fill="#fff"/>
+          <rect class="gr-pf-bg"     x="856" y="68" width="48" height="64" rx="1" fill="#ccc"/>
+          <image class="gr-photo-img" href="" x="856" y="68" width="48" height="64" preserveAspectRatio="xMidYMid slice"/>
         </g>
         <!-- Frame 9: top right, between 7 and 8 -->
-        <g class="gr-photo-frame" data-photo="8" transform="rotate(-2 745 175)">
-          <rect x="715" y="148" width="58" height="58" rx="2" fill="#fff"/>
-          <rect x="721" y="154" width="46" height="46" rx="1" fill="#ccc"/>
-          <image href="" x="721" y="154" width="46" height="46" class="gr-photo-img" preserveAspectRatio="xMidYMid slice"/>
+        <g class="gr-photo-frame" data-photo="8" data-cx="745" data-cy="175" data-max-w="64" data-max-h="64" data-rot="-2">
+          <rect class="gr-pf-border" x="715" y="148" width="58" height="58" rx="2" fill="#fff"/>
+          <rect class="gr-pf-bg"     x="721" y="154" width="46" height="46" rx="1" fill="#ccc"/>
+          <image class="gr-photo-img" href="" x="721" y="154" width="46" height="46" preserveAspectRatio="xMidYMid slice"/>
         </g>
 
-        <!-- ══ FRAME VIDEO BESAR — EYE CATCHING, BERGOYANG ══ -->
-        <g id="gr-video-frame" class="gr-video-frame-group">
-          <g id="gr-video-frame-inner" transform="rotate(0 250 320)">
-            <rect x="178" y="248" width="148" height="148" rx="4" fill="#2a1c10"/>
-            <rect x="186" y="256" width="132" height="132" rx="2" fill="#0a0a14"/>
-            <!-- video poster placeholder: kid silhouette / play icon -->
-            <rect x="190" y="260" width="124" height="124" fill="#15131c"/>
-            <circle cx="252" cy="322" r="26" fill="rgba(255,255,255,.12)"/>
-            <path d="M243 308 L243 336 L268 322Z" fill="#fff" opacity=".9"/>
-            <text x="252" y="372" text-anchor="middle" fill="#f0d060" font-family="Cormorant Garamond, serif" font-size="10" letter-spacing="2">TONTON</text>
-            <circle cx="252" cy="322" r="80" fill="transparent" id="gr-video-frame-tap"/>
+        <!-- ══ TV — menggantikan frame video, sejajar lantai seperti sofa ══ -->
+        <g id="gr-video-frame" class="gr-video-frame-group" data-anchor-x="916" cursor="pointer">
+          <!-- TV stand/legs -->
+          <rect x="886" y="438" width="10" height="22" rx="2" fill="#3a3228"/>
+          <rect x="936" y="438" width="10" height="22" rx="2" fill="#3a3228"/>
+          <rect x="874" y="456" width="84" height="6" rx="2" fill="#2a241c"/>
+          <!-- TV body -->
+          <rect x="848" y="290" width="136" height="150" rx="6" fill="#1c1a16"/>
+          <rect x="856" y="298" width="120" height="134" rx="3" fill="#050507" id="gr-tv-screen-bg"/>
+          <!-- Screen content group: glitch + question mark -->
+          <g id="gr-tv-screen-content">
+            <rect x="856" y="298" width="120" height="134" rx="3" fill="#0a0a0c"/>
+            <text x="916" y="378" text-anchor="middle" fill="#f0d060" font-family="Georgia, serif" font-size="58" font-weight="700" id="gr-tv-qmark">?</text>
           </g>
+          <!-- subtle screen glare -->
+          <path d="M864 306 L908 306 L880 360 L856 360 Z" fill="rgba(255,255,255,.04)"/>
+          <circle cx="916" cy="365" r="90" fill="transparent" id="gr-video-frame-tap" cursor="pointer"/>
         </g>
 
         <!-- ══ HANGING LAMP — SATU-SATUNYA LAMPU, HOTSPOT ══ -->
-        <g id="gr-hotspot-lamp" class="gr-hotspot" data-id="lamp" tabindex="0" role="button" aria-label="Lampu">
+        <g id="gr-hotspot-lamp" class="gr-hotspot" data-id="lamp" data-anchor-x="930" data-anchor-y="78" tabindex="0" role="button" aria-label="Lampu">
           <line x1="930" y1="0" x2="930" y2="60" stroke="#5a4a30" stroke-width="2"/>
           <path d="M898 60 L962 60 L946 96 L914 96 Z" fill="#e0a840"/>
           <circle cx="930" cy="100" r="6" fill="#fff4d0" id="gr-lamp-bulb"/>
@@ -3833,26 +3936,10 @@
           <circle cx="930" cy="78" r="42" fill="transparent" class="gr-tap-target"/>
         </g>
 
-        <!-- ══ BOOKSHELF (decorative only) ══ -->
-        <g opacity=".95">
-          <rect x="850" y="200" width="132" height="220" fill="#5a4632" rx="2"/>
-          <rect x="858" y="208" width="116" height="48" fill="#46362770"/>
-          <rect x="858" y="262" width="116" height="48" fill="#46362770"/>
-          <rect x="858" y="316" width="116" height="48" fill="#46362770"/>
-          <rect x="858" y="370" width="116" height="42" fill="#46362770"/>
-          <rect x="864" y="212" width="7" height="40" fill="#c0533f"/>
-          <rect x="873" y="212" width="7" height="40" fill="#5c8a6e"/>
-          <rect x="882" y="212" width="6" height="40" fill="#3c6f8a"/>
-          <rect x="890" y="212" width="7" height="40" fill="#d4a23c"/>
-          <rect x="864" y="266" width="6" height="40" fill="#7d5ba0"/>
-          <rect x="872" y="266" width="7" height="40" fill="#c0533f"/>
-          <rect x="881" y="266" width="7" height="40" fill="#5c8a6e"/>
-          <rect x="864" y="320" width="7" height="40" fill="#3c6f8a"/>
-          <rect x="873" y="320" width="6" height="40" fill="#d4a23c"/>
-        </g>
+        <!-- (Rak buku dihapus — diganti TV di atas) -->
 
         <!-- ══ TALL PLANT (kiri bawah) — HOTSPOT ══ -->
-        <g id="gr-hotspot-plant" class="gr-hotspot" data-id="plant" tabindex="0" role="button" aria-label="Tanaman">
+        <g id="gr-hotspot-plant" class="gr-hotspot" data-id="plant" data-anchor-x="68" data-anchor-y="380" tabindex="0" role="button" aria-label="Tanaman">
           <rect x="45" y="410" width="46" height="56" rx="4" fill="#6b4a34"/>
           <rect x="48" y="413" width="40" height="6" fill="#7d5a40"/>
           <path d="M68 412 C50 390 40 350 46 315 C58 348 68 380 70 412Z" fill="#5d8a52"/>
@@ -3862,7 +3949,7 @@
         </g>
 
         <!-- ══ KOTAK HADIAH — HOTSPOT ══ -->
-        <g id="gr-hotspot-giftbox" class="gr-hotspot" data-id="giftbox" tabindex="0" role="button" aria-label="Kotak Hadiah">
+        <g id="gr-hotspot-giftbox" class="gr-hotspot" data-id="giftbox" data-anchor-x="179" data-anchor-y="415" tabindex="0" role="button" aria-label="Kotak Hadiah">
           <g id="gr-giftbox-lid">
             <rect x="148" y="392" width="62" height="14" rx="2" fill="#c0533f"/>
             <rect x="172" y="386" width="14" height="20" fill="#e8c850"/>
@@ -3873,17 +3960,17 @@
         </g>
 
         <!-- ══ CERMIN BERDIRI (full body) — HOTSPOT, area kosong antara sofa & rak buku ══ -->
-        <g id="gr-hotspot-mirror" class="gr-hotspot" data-id="mirror" tabindex="0" role="button" aria-label="Cermin">
+        <g id="gr-hotspot-mirror" class="gr-hotspot" data-id="mirror" data-anchor-x="790" data-anchor-y="345" tabindex="0" role="button" aria-label="Cermin">
           <!-- stand legs (menyentuh garis lantai y=460, simetris) -->
-          <line x1="765" y1="452" x2="748" y2="468" stroke="#8a6a44" stroke-width="5" stroke-linecap="round"/>
-          <line x1="815" y1="452" x2="832" y2="468" stroke="#8a6a44" stroke-width="5" stroke-linecap="round"/>
+          <line x1="758" y1="452" x2="740" y2="468" stroke="#8a6a44" stroke-width="6" stroke-linecap="round"/>
+          <line x1="822" y1="452" x2="840" y2="468" stroke="#8a6a44" stroke-width="6" stroke-linecap="round"/>
           <!-- frame (full body, area kosong antara sofa & bookshelf) -->
-          <rect x="750" y="264" width="80" height="192" rx="40" fill="#a8804c"/>
-          <rect x="757" y="271" width="66" height="178" rx="33" fill="#dfe8ec"/>
-          <rect x="762" y="276" width="56" height="168" rx="28" fill="url(#gr-mirrorgrad)"/>
+          <rect x="738" y="232" width="104" height="224" rx="50" fill="#a8804c"/>
+          <rect x="746" y="240" width="88" height="208" rx="42" fill="#dfe8ec"/>
+          <rect x="752" y="246" width="76" height="196" rx="36" fill="url(#gr-mirrorgrad)" id="gr-mirror-glass"/>
           <!-- mirror shine -->
-          <path d="M774 286 Q770 360 779 436" stroke="#fff" stroke-width="5" opacity=".35" fill="none" stroke-linecap="round"/>
-          <circle cx="790" cy="360" r="76" fill="transparent" class="gr-tap-target"/>
+          <path d="M768 258 Q762 345 774 432" stroke="#fff" stroke-width="5" opacity=".3" fill="none" stroke-linecap="round"/>
+          <circle cx="790" cy="345" r="84" fill="transparent" class="gr-tap-target"/>
         </g>
 
         <!-- ══ HANGING LAMP — DIHAPUS (cukup 1 lampu saja, sudah di atas) ══ -->
@@ -3901,7 +3988,7 @@
         <rect x="232" y="420" width="92" height="8" fill="#8a6a48"/>
         <rect x="240" y="428" width="8" height="38" fill="#7a5a3c"/>
         <rect x="308" y="428" width="8" height="38" fill="#7a5a3c"/>
-        <g id="gr-hotspot-book" class="gr-hotspot" data-id="book" tabindex="0" role="button" aria-label="Buku">
+        <g id="gr-hotspot-book" class="gr-hotspot" data-id="book" data-anchor-x="270" data-anchor-y="393" tabindex="0" role="button" aria-label="Buku">
           <rect x="246" y="400" width="48" height="9" rx="1.5" fill="#e8e2d4"/>
           <rect x="246" y="400" width="48" height="3" fill="#c0533f"/>
           <rect x="250" y="386" width="42" height="9" rx="1.5" fill="#dcd6c6"/>
@@ -3910,7 +3997,7 @@
         </g>
 
         <!-- ══ TUMBLER — HOTSPOT ══ -->
-        <g id="gr-hotspot-tumbler" class="gr-hotspot" data-id="tumbler" tabindex="0" role="button" aria-label="Tumbler">
+        <g id="gr-hotspot-tumbler" class="gr-hotspot" data-id="tumbler" data-anchor-x="308" data-anchor-y="390" tabindex="0" role="button" aria-label="Tumbler">
           <rect x="300" y="380" width="16" height="26" rx="4" fill="#c9956a"/>
           <rect x="300" y="380" width="16" height="6" rx="3" fill="#a87850"/>
           <circle cx="308" cy="377" r="4" fill="#8a6038"/>
@@ -3918,7 +4005,7 @@
         </g>
 
         <!-- ══ SOFA — HOTSPOT ══ -->
-        <g id="gr-hotspot-sofa" class="gr-hotspot" data-id="sofa" tabindex="0" role="button" aria-label="Sofa">
+        <g id="gr-hotspot-sofa" class="gr-hotspot" data-id="sofa" data-anchor-x="528" data-anchor-y="330" tabindex="0" role="button" aria-label="Sofa">
           <rect x="368" y="340" width="320" height="100" rx="14" fill="#9b958a"/>
           <rect x="368" y="310" width="320" height="60" rx="18" fill="#a8a296"/>
           <rect x="356" y="330" width="30" height="92" rx="12" fill="#8e887c"/>
@@ -3930,7 +4017,7 @@
         </g>
 
         <!-- ══ BANTAL ORANGE — HOTSPOT ══ -->
-        <g id="gr-hotspot-pillow-o" class="gr-hotspot" data-id="pillow-o" tabindex="0" role="button" aria-label="Bantal oranye">
+        <g id="gr-hotspot-pillow-o" class="gr-hotspot" data-id="pillow-o" data-anchor-x="443" data-anchor-y="360" tabindex="0" role="button" aria-label="Bantal oranye">
           <rect x="404" y="346" width="78" height="62" rx="10" fill="#e0a850" transform="rotate(-6 443 377)"/>
           <line x1="412" y1="360" x2="460" y2="400" stroke="#fff" stroke-width="5" opacity=".5" transform="rotate(-6 443 377)"/>
           <line x1="424" y1="352" x2="472" y2="392" stroke="#fff" stroke-width="5" opacity=".5" transform="rotate(-6 443 377)"/>
@@ -3938,7 +4025,7 @@
         </g>
 
         <!-- ══ BANTAL HIJAU — HOTSPOT ══ -->
-        <g id="gr-hotspot-pillow-g" class="gr-hotspot" data-id="pillow-g" tabindex="0" role="button" aria-label="Bantal hijau">
+        <g id="gr-hotspot-pillow-g" class="gr-hotspot" data-id="pillow-g" data-anchor-x="625" data-anchor-y="360" tabindex="0" role="button" aria-label="Bantal hijau">
           <rect x="586" y="346" width="78" height="62" rx="10" fill="#7ea868" transform="rotate(6 625 377)"/>
           <line x1="594" y1="360" x2="642" y2="400" stroke="#fff" stroke-width="5" opacity=".5" transform="rotate(6 625 377)"/>
           <line x1="606" y1="352" x2="654" y2="392" stroke="#fff" stroke-width="5" opacity=".5" transform="rotate(6 625 377)"/>
@@ -3956,8 +4043,9 @@
             <stop offset="100%" stop-color="#000" stop-opacity=".05"/>
           </linearGradient>
           <linearGradient id="gr-skygrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#bfe3f0"/>
-            <stop offset="100%" stop-color="#e8f4ec"/>
+            <stop offset="0%" stop-color="#1a1838"/>
+            <stop offset="55%" stop-color="#2a2550"/>
+            <stop offset="100%" stop-color="#3a3050"/>
           </linearGradient>
           <linearGradient id="gr-mirrorgrad" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stop-color="#dceef2"/>
@@ -4019,6 +4107,14 @@
     <div id="gr-mirror-popup" class="gr-mirror-popup">
       <p>Coba lihat baik-baik... ada orang spesial sedang menatap balik ke arahmu 🪞✨</p>
     </div>
+
+    <!-- Photo zoom overlay — FLIP animation dari posisi frame ke tengah layar -->
+    <div id="gr-photo-zoom-overlay">
+      <div id="gr-photo-zoom-img-wrap">
+        <img id="gr-photo-zoom-img" src="" alt="">
+      </div>
+    </div>
+    <div id="gr-photo-zoom-hint">ketuk di mana saja untuk menutup</div>
 
     <!-- ══ WATCH REVEAL MODAL ══ -->
     <div id="gr-watch-reveal" class="gr-watch-reveal">
@@ -6070,28 +6166,53 @@
         }
       }
 
-      function showTooltip(targetEl, text) {
+      // ── Hitung posisi px di dalam room-wrap dari koordinat SVG asli (akurat, tidak terpengaruh tap-target yang melebar) ──
+      function svgPointToRoomPx(svgX, svgY) {
+        const svgEl = document.getElementById('gr-room-svg');
+        const vb = svgEl.viewBox.baseVal;
+        const scale = svgEl.offsetWidth / vb.width;
+        // Posisi svg relatif ke room-wrap (svg selalu dimulai dari pojok kiri-atas room-wrap secara layout normal)
+        return { x: svgX * scale, y: svgY * scale, scale };
+      }
+
+      function getAnchorPoint(targetEl) {
+        // Prioritas: data-anchor-x/y eksplisit (akurat, sesuai posisi visual asli)
+        const ax = targetEl.getAttribute('data-anchor-x');
+        const ay = targetEl.getAttribute('data-anchor-y');
+        if (ax !== null && ay !== null) {
+          return svgPointToRoomPx(parseFloat(ax), parseFloat(ay));
+        }
+        // Fallback: bounding box (untuk elemen non-SVG atau tanpa anchor)
         const roomRect = room.getBoundingClientRect();
         const tRect = targetEl.getBoundingClientRect();
-        const x = tRect.left + tRect.width / 2 - roomRect.left;
-        const y = tRect.top - roomRect.top;
+        return {
+          x: tRect.left + tRect.width / 2 - roomRect.left,
+          y: tRect.top + tRect.height / 2 - roomRect.top,
+          scale: 1
+        };
+      }
+
+      function showTooltip(targetEl, text) {
+        const pt = getAnchorPoint(targetEl);
+        const roomRect = room.getBoundingClientRect();
+        const x = pt.x;
+        // Tampilkan tooltip sedikit di atas titik anchor (bukan di atas bounding box raksasa)
+        const y = Math.max(pt.y - 26 * (pt.scale || 1), 30);
 
         tooltip.textContent = text;
         tooltip.style.left = x + 'px';
-        tooltip.style.top  = Math.max(y, 30) + 'px';
+        tooltip.style.top  = y + 'px';
         // Reset shift before measuring natural size
         tooltip.style.setProperty('--tip-shift', '0px');
         tooltip.classList.add('show');
 
         // ── Clamp horizontally so tooltip never overflows room/viewport ──
-        // Measure after it's shown (display via opacity, but width/height already computable since width:max-content)
         requestAnimationFrame(() => {
           const tw = tooltip.offsetWidth;
           const halfW = tw / 2;
           const margin = 10; // px breathing room from edges
           const roomW = roomRect.width;
 
-          // Tooltip's natural left/right edge (centered on x, before shift)
           let shift = 0;
           const naturalLeft  = x - halfW;
           const naturalRight = x + halfW;
@@ -6106,16 +6227,16 @@
         });
 
         clearTimeout(tooltip._hideTimer);
+        // Durasi diperpanjang agar pesan lucu sempat terbaca jelas
         tooltip._hideTimer = setTimeout(() => {
           tooltip.classList.remove('show');
-        }, 2400);
+        }, 4200);
       }
 
       function burstSparkles(targetEl) {
-        const roomRect = room.getBoundingClientRect();
-        const tRect = targetEl.getBoundingClientRect();
-        const cx = tRect.left + tRect.width / 2 - roomRect.left;
-        const cy = tRect.top + tRect.height / 2 - roomRect.top;
+        const pt = getAnchorPoint(targetEl);
+        const cx = pt.x;
+        const cy = pt.y;
 
         const colors = ['#f0c860','#e8a850','#7ea868','#d97a9c','#7aa8c8','#fff'];
         const n = 10 + Math.floor(Math.random() * 4);
@@ -6255,10 +6376,216 @@
         '1Kfwx7dEKE-nlOIOYwExkb7MXvd7mCb6L',
         '12ZkhotXhTfC3Q95npkXEFnMDKHbgFkWT'
       ];
-      document.querySelectorAll('.gr-photo-img').forEach((img, idx) => {
-        const id = GR_PHOTO_IDS[idx];
-        if (id) img.setAttribute('href', `https://lh3.googleusercontent.com/d/${id}`);
-      });
+
+      /* ══ Muat dimensi asli setiap foto → resize frame proporsional (tanpa crop) ══ */
+      (function initPhotoFrames() {
+        const frames = document.querySelectorAll('.gr-photo-frame');
+
+        frames.forEach((frameEl, idx) => {
+          const id = GR_PHOTO_IDS[idx];
+          if (!id) return;
+
+          const url = `https://lh3.googleusercontent.com/d/${id}`;
+          const cx = parseFloat(frameEl.getAttribute('data-cx'));
+          const cy = parseFloat(frameEl.getAttribute('data-cy'));
+          const maxW = parseFloat(frameEl.getAttribute('data-max-w'));
+          const maxH = parseFloat(frameEl.getAttribute('data-max-h'));
+          const rot = parseFloat(frameEl.getAttribute('data-rot')) || 0;
+
+          frameEl.classList.add('gr-pf-pending');
+
+          const borderEl = frameEl.querySelector('.gr-pf-border');
+          const bgEl     = frameEl.querySelector('.gr-pf-bg');
+          const imgEl    = frameEl.querySelector('.gr-photo-img');
+
+          const probe = new Image();
+          probe.onload = () => {
+            const natW = probe.naturalWidth  || 1;
+            const natH = probe.naturalHeight || 1;
+            const ratio = natW / natH;
+
+            // Fit ke dalam area maksimum (maxW x maxH) sambil menjaga aspect ratio asli foto
+            let fitW = maxW, fitH = maxW / ratio;
+            if (fitH > maxH) { fitH = maxH; fitW = maxH * ratio; }
+
+            const borderPad = 6; // jarak bingkai putih ke foto
+            const frameW = fitW + borderPad;
+            const frameH = fitH + borderPad;
+
+            const fx = cx - fitW / 2;
+            const fy = cy - fitH / 2;
+            const bx = cx - frameW / 2;
+            const by = cy - frameH / 2;
+
+            if (borderEl) {
+              borderEl.setAttribute('x', bx);
+              borderEl.setAttribute('y', by);
+              borderEl.setAttribute('width', frameW);
+              borderEl.setAttribute('height', frameH);
+            }
+            if (bgEl) {
+              bgEl.setAttribute('x', fx);
+              bgEl.setAttribute('y', fy);
+              bgEl.setAttribute('width', fitW);
+              bgEl.setAttribute('height', fitH);
+            }
+            if (imgEl) {
+              imgEl.setAttribute('x', fx);
+              imgEl.setAttribute('y', fy);
+              imgEl.setAttribute('width', fitW);
+              imgEl.setAttribute('height', fitH);
+              imgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet'); // tidak crop, aspect ratio asli
+              imgEl.setAttribute('href', url);
+            }
+
+            // Simpan data area foto (utk FLIP zoom nanti) dalam dataset
+            frameEl.dataset.fx = fx; frameEl.dataset.fy = fy;
+            frameEl.dataset.fw = fitW; frameEl.dataset.fh = fitH;
+            frameEl.dataset.photoUrl = url;
+
+            frameEl.setAttribute('transform', `rotate(${rot} ${cx} ${cy})`);
+            frameEl.classList.remove('gr-pf-pending');
+            frameEl.classList.add('gr-pf-ready');
+          };
+          probe.onerror = () => {
+            // Jika foto gagal dimuat, tetap tampilkan frame default (persegi) agar tidak invisible selamanya
+            if (imgEl) imgEl.setAttribute('href', url);
+            frameEl.setAttribute('transform', `rotate(${rot} ${cx} ${cy})`);
+            frameEl.classList.remove('gr-pf-pending');
+            frameEl.classList.add('gr-pf-ready');
+          };
+          probe.src = url;
+        });
+      })();
+
+      /* ══ KLIK FOTO → ZOOM FULLSCREEN (FLIP animation), lalu auto-kembali ══ */
+      (function initPhotoZoom() {
+        const overlay  = document.getElementById('gr-photo-zoom-overlay');
+        const imgWrap  = document.getElementById('gr-photo-zoom-img-wrap');
+        const zoomImg  = document.getElementById('gr-photo-zoom-img');
+        if (!overlay || !imgWrap || !zoomImg) return;
+
+        let autoCloseTimer = null;
+        let activeFrame = null;
+        let isOpen = false;
+
+        function openZoom(frameEl) {
+          if (isOpen) return;
+          isOpen = true;
+          activeFrame = frameEl;
+
+          const svgEl = document.getElementById('gr-room-svg');
+          const vb = svgEl.viewBox.baseVal;
+          const svgRect = svgEl.getBoundingClientRect();
+          const scale = svgRect.width / vb.width;
+
+          const fx = parseFloat(frameEl.dataset.fx);
+          const fy = parseFloat(frameEl.dataset.fy);
+          const fw = parseFloat(frameEl.dataset.fw);
+          const fh = parseFloat(frameEl.dataset.fh);
+          const url = frameEl.dataset.photoUrl;
+
+          // Posisi awal di viewport (px), dari koordinat SVG asli
+          const startLeft = svgRect.left + fx * scale;
+          const startTop  = svgRect.top  + fy * scale;
+          const startW    = fw * scale;
+          const startH    = fh * scale;
+
+          // Set posisi awal TANPA transisi (langsung di tempat foto asli)
+          imgWrap.style.transition = 'none';
+          imgWrap.style.left   = startLeft + 'px';
+          imgWrap.style.top    = startTop + 'px';
+          imgWrap.style.width  = startW + 'px';
+          imgWrap.style.height = startH + 'px';
+          imgWrap.style.borderRadius = '2px';
+          zoomImg.src = url;
+
+          // Sembunyikan frame asli (biar tidak dobel terlihat)
+          frameEl.classList.add('gr-pf-zooming');
+
+          overlay.classList.add('active');
+
+          // Hitung ukuran target (tengah layar, fit ke viewport dengan margin, jaga aspect ratio asli foto)
+          requestAnimationFrame(() => {
+            const vw = window.innerWidth, vh = window.innerHeight;
+            const marginPct = 0.08;
+            const maxTargetW = vw * (1 - marginPct * 2);
+            const maxTargetH = vh * (1 - marginPct * 2) - 40; // sisakan ruang utk hint text
+
+            const ratio = fw / fh;
+            let targetW = maxTargetW, targetH = maxTargetW / ratio;
+            if (targetH > maxTargetH) { targetH = maxTargetH; targetW = maxTargetH * ratio; }
+
+            const targetLeft = (vw - targetW) / 2;
+            const targetTop  = (vh - targetH) / 2;
+
+            // Re-enable transition lalu animate ke posisi target (FLIP "Play" step)
+            imgWrap.style.transition = '';
+            imgWrap.style.left   = targetLeft + 'px';
+            imgWrap.style.top    = targetTop + 'px';
+            imgWrap.style.width  = targetW + 'px';
+            imgWrap.style.height = targetH + 'px';
+            imgWrap.style.borderRadius = '6px';
+          });
+
+          // Auto-close setelah beberapa saat dilihat (sesuai request: "beberapa saat lalu kembali kecil")
+          clearTimeout(autoCloseTimer);
+          autoCloseTimer = setTimeout(closeZoom, 4500);
+        }
+
+        function closeZoom() {
+          if (!isOpen || !activeFrame) return;
+          clearTimeout(autoCloseTimer);
+
+          const frameEl = activeFrame;
+          const svgEl = document.getElementById('gr-room-svg');
+          const vb = svgEl.viewBox.baseVal;
+          const svgRect = svgEl.getBoundingClientRect();
+          const scale = svgRect.width / vb.width;
+
+          const fx = parseFloat(frameEl.dataset.fx);
+          const fy = parseFloat(frameEl.dataset.fy);
+          const fw = parseFloat(frameEl.dataset.fw);
+          const fh = parseFloat(frameEl.dataset.fh);
+
+          const backLeft = svgRect.left + fx * scale;
+          const backTop  = svgRect.top  + fy * scale;
+          const backW    = fw * scale;
+          const backH    = fh * scale;
+
+          // Animate kembali ke posisi/ukuran asli di dinding
+          imgWrap.style.left   = backLeft + 'px';
+          imgWrap.style.top    = backTop + 'px';
+          imgWrap.style.width  = backW + 'px';
+          imgWrap.style.height = backH + 'px';
+          imgWrap.style.borderRadius = '2px';
+
+          overlay.classList.remove('active');
+
+          setTimeout(() => {
+            frameEl.classList.remove('gr-pf-zooming');
+            isOpen = false;
+            activeFrame = null;
+          }, 560);
+        }
+
+        // Klik frame foto → buka zoom
+        document.querySelectorAll('.gr-photo-frame').forEach(frameEl => {
+          frameEl.addEventListener('click', e => {
+            e.preventDefault();
+            if (frameEl.classList.contains('gr-pf-pending')) return; // belum siap diukur
+            openZoom(frameEl);
+          });
+        });
+
+        // Klik di mana saja pada overlay → tutup lebih cepat (user-initiated)
+        overlay.addEventListener('click', () => closeZoom());
+
+        // Reposisi saat resize / scroll horizontal (mobile) supaya FLIP tetap akurat jika user interaksi saat animasi
+        window.addEventListener('resize', () => {
+          if (isOpen) closeZoom();
+        });
+      })();
 
       // ── JENDELA hotspot ──
       const windowEl = document.getElementById('gr-hotspot-window');
@@ -6347,14 +6674,14 @@
         const vb = svgEl.viewBox.baseVal;
         const scale = svgEl.offsetWidth / vb.width;
 
-        // koordinat kaca cermin dalam SVG: x=762,y=276,w=56,h=168 (rx=28 → bulat lonjong)
-        const mx = 762 * scale, my = 276 * scale;
-        const mw = 56 * scale, mh = 168 * scale;
+        // koordinat kaca cermin dalam SVG (diperbesar): x=752,y=246,w=76,h=196 (rx=36)
+        const mx = 752 * scale, my = 246 * scale;
+        const mw = 76 * scale, mh = 196 * scale;
         mirrorCamWrap.style.left = mx + 'px';
         mirrorCamWrap.style.top  = my + 'px';
         mirrorCamWrap.style.width  = mw + 'px';
         mirrorCamWrap.style.height = mh + 'px';
-        mirrorCamWrap.style.borderRadius = (28 * scale) + 'px';
+        mirrorCamWrap.style.borderRadius = (36 * scale) + 'px';
       }
 
       async function triggerMirror(e) {
@@ -6379,12 +6706,37 @@
           return;
         }
 
+        // Cek dukungan browser dulu
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          mirrorPopup.textContent = 'Coba lihat baik-baik... ada orang spesial sedang menatap balik ke arahmu 🪞✨';
+          mirrorPopup.classList.add('show');
+          clearTimeout(mirrorPopup._hideTimer);
+          mirrorPopup._hideTimer = setTimeout(() => mirrorPopup.classList.remove('show'), 3500);
+          return;
+        }
+
         try {
           mirrorStream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'user' }, audio: false
+            video: { facingMode: 'user', width: { ideal: 480 }, height: { ideal: 640 } },
+            audio: false
           });
+
           mirrorCamVideo.srcObject = mirrorStream;
+
+          // Posisikan SEBELUM video ditampilkan, supaya saat muncul ukurannya sudah pas
           positionMirrorCam();
+
+          // Tunggu video benar-benar punya frame (loadedmetadata) sebelum di-reveal,
+          // supaya tidak muncul kosong/hitam di mobile
+          await new Promise(resolve => {
+            if (mirrorCamVideo.readyState >= 2) { resolve(); return; }
+            mirrorCamVideo.onloadeddata = resolve;
+            // Fallback timeout jika event tidak fire (beberapa browser mobile)
+            setTimeout(resolve, 600);
+          });
+
+          try { await mirrorCamVideo.play(); } catch (playErr) { /* autoplay sudah ada attribute, biasanya aman */ }
+
           mirrorCamWrap.classList.add('active');
           mirrorActive = true;
 
@@ -6416,6 +6768,33 @@
         const fsGrain  = document.getElementById('gr-vfs-grain');
 
         if (!frameTap || !fsWrap || !fsVideo) return;
+
+        // ── Glitch noise-bar idle di layar TV (sebelum diklik) ──
+        (function tvIdleGlitch() {
+          const screenContent = document.getElementById('gr-tv-screen-content');
+          if (!screenContent) return;
+          const svgNS = 'http://www.w3.org/2000/svg';
+
+          function spawnGlitchBar() {
+            const bar = document.createElementNS(svgNS, 'rect');
+            const bh = 2 + Math.random() * 8;
+            const by = 298 + Math.random() * (134 - bh);
+            bar.setAttribute('x', 856);
+            bar.setAttribute('y', by);
+            bar.setAttribute('width', 120);
+            bar.setAttribute('height', bh);
+            bar.setAttribute('fill', 'rgba(255,255,255,.10)');
+            bar.setAttribute('style', 'mix-blend-mode:screen;pointer-events:none;');
+            screenContent.appendChild(bar);
+            setTimeout(() => bar.remove(), 120 + Math.random() * 100);
+          }
+
+          (function loop() {
+            const n = 1 + Math.floor(Math.random() * 2);
+            for (let i = 0; i < n; i++) spawnGlitchBar();
+            setTimeout(loop, 1400 + Math.random() * 1800);
+          })();
+        })();
 
         let grainActive = false;
         // Film grain for fullscreen video
