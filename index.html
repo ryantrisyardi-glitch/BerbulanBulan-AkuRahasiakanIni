@@ -3936,7 +3936,7 @@
         </g>
 
         <!-- ══ TV — menggantikan frame video, sejajar lantai seperti sofa ══ -->
-        <g id="gr-video-frame" class="gr-video-frame-group" data-anchor-x="916" cursor="pointer">
+        <g id="gr-video-frame" class="gr-video-frame-group" data-anchor-x="916" data-anchor-y="320" cursor="pointer">
           <!-- TV stand/legs -->
           <rect x="886" y="393" width="10" height="18" rx="2" fill="#3a3228"/>
           <rect x="936" y="393" width="10" height="18" rx="2" fill="#3a3228"/>
@@ -6210,11 +6210,12 @@
           return svgPointToRoomPx(parseFloat(ax), parseFloat(ay));
         }
         // Fallback: bounding box (untuk elemen non-SVG atau tanpa anchor)
+        // PENTING: Tambahkan room.scrollLeft/scrollTop karena kontainer kamar bisa digeser (scrolled) di mobile view
         const roomRect = room.getBoundingClientRect();
         const tRect = targetEl.getBoundingClientRect();
         return {
-          x: tRect.left + tRect.width / 2 - roomRect.left,
-          y: tRect.top + tRect.height / 2 - roomRect.top,
+          x: tRect.left + tRect.width / 2 - roomRect.left + room.scrollLeft,
+          y: tRect.top + tRect.height / 2 - roomRect.top + room.scrollTop,
           scale: 1
         };
       }
@@ -6254,13 +6255,14 @@
           const roomW = roomRect.width;
 
           let shift = 0;
-          const naturalLeft  = x - halfW;
-          const naturalRight = x + halfW;
+          // Cek overflow di koordinat viewport layar (bukan koordinat scroll room)
+          const naturalViewportLeft  = (x - room.scrollLeft) - halfW;
+          const naturalViewportRight = (x - room.scrollLeft) + halfW;
 
-          if (naturalLeft < margin) {
-            shift = margin - naturalLeft; // push right
-          } else if (naturalRight > roomW - margin) {
-            shift = (roomW - margin) - naturalRight; // push left
+          if (naturalViewportLeft < margin) {
+            shift = margin - naturalViewportLeft; // push right
+          } else if (naturalViewportRight > roomW - margin) {
+            shift = (roomW - margin) - naturalViewportRight; // push left
           }
 
           tooltip.style.setProperty('--tip-shift', shift + 'px');
