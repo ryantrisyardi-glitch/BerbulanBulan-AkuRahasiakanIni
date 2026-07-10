@@ -4603,13 +4603,61 @@
         }
       });
 
-      // Sheet 10: Outro Page 4 (front) + blank inside (back)
+      // Sheet 10: Outro Page 4 (front) + Dual photo Abah & Mamah (back)
       sheetsData.push({
         front: {
           type: 'outro',
           header: '🌹 Teruslah Melangkah',
           content: 'Karena itu, teruslah melangkah.\n\nJadilah wanita yang semakin shalihah, istri yang terbaik, dan ibu yang penuh kasih sayang.',
           pageNum: 20
+        },
+        back: {
+          type: 'dual-photo',
+          imgAbah: 'https://lh3.googleusercontent.com/d/1VtPiflB5QAAwNkGBKkpxy7LnK4p1BrMN',
+          imgMamah: 'https://lh3.googleusercontent.com/d/1SUrUN-dzmN1dEddTk9WmrlWjZw1cBKcV',
+          pageNum: 21
+        }
+      });
+
+      // Sheet 11: Paragraf AI (front) + Dual photo Abah & Mamah (back)
+      sheetsData.push({
+        front: {
+          type: 'outro',
+          header: '🤍 Kenangan yang Tersimpan',
+          content: 'Papa sebenarnya bisa membuat foto abah sama mamah tersenyum atau bahkan menghidupkannya dengan bantuan AI. Namun papa memilih membiarkan kenangan yang tersimpan di kepalamu, dibalut dengan cinta yang ada di hatimu untuk mengimajinasikan abah dan mamah tersenyum menyapa.',
+          pageNum: 22
+        },
+        back: {
+          type: 'dual-photo',
+          imgAbah: 'https://lh3.googleusercontent.com/d/1VtPiflB5QAAwNkGBKkpxy7LnK4p1BrMN',
+          imgMamah: 'https://lh3.googleusercontent.com/d/1SUrUN-dzmN1dEddTk9WmrlWjZw1cBKcV',
+          pageNum: 23
+        }
+      });
+
+      // Sheet 12: Paragraf harapan (front) + Dual photo Abah & Mamah (back)
+      sheetsData.push({
+        front: {
+          type: 'outro',
+          header: '🌱 Harapan Orang Tua',
+          content: 'Abah dan mamah tidak mengharapkan kesempurnaan. Mereka hanya ingin melihatmu menjadi pribadi yang lebih baik daripada yang sempat mereka didik dan harapkan.\n\nBegitu pula kelak harapanmu kepada Kaafindra untuk bisa tumbuh menjadi laki-laki yang memimpin keluarganya dengan bijaksana, disertai ilmu agama yang baik.\n\nMaka, bentuklah dirimu sekarang menjadi apa yang orang tuamu harapkan seperti kamu berharap kepada anakmu.',
+          pageNum: 24
+        },
+        back: {
+          type: 'dual-photo',
+          imgAbah: 'https://lh3.googleusercontent.com/d/1VtPiflB5QAAwNkGBKkpxy7LnK4p1BrMN',
+          imgMamah: 'https://lh3.googleusercontent.com/d/1SUrUN-dzmN1dEddTk9WmrlWjZw1cBKcV',
+          pageNum: 25
+        }
+      });
+
+      // Sheet 13: Paragraf ajakan (front) + Back cover (back)
+      sheetsData.push({
+        front: {
+          type: 'outro',
+          header: '🌹 Bekal Menuju Pulang',
+          content: 'Inilah saatnya untuk jauh lebih baik dalam ibadah, berubah lebih konsisten dalam karakter, manfaatkan sisa waktu kita dengan belajar apa yang belum sempat kita pelajari, dan kurangi hal-hal yang tidak ada manfaatnya untuk kita.\n\nKini langkahmu ada pada ridha suami, mamah dan abah menunggumu di sana. Yuk kita siapkan bekal yang lebih banyak untuk kita bersama-sama pulang suatu hari kelak.',
+          pageNum: 26
         },
         back: {
           type: 'back-cover',
@@ -4690,6 +4738,27 @@
               <div class="book-page-footer">
                 <span>Halaman ${faceData.pageNum}</span>
                 <span>🌹</span>
+              </div>
+            </div>`;
+        } else if (faceData.type === 'dual-photo') {
+          faceElement.style.padding = '0';
+          faceElement.style.background = '#fdfaf2';
+          faceElement.innerHTML = `
+            <div class="book-page-container photo-page">
+              <div class="book-page-header">Abah &amp; Mamah</div>
+              <div style="display:flex; gap:8px; width:100%; height:100%; flex:1; padding: 4px 10px;">
+                <div class="book-photo-frame" style="flex:1; display:flex; flex-direction:column; align-items:center;">
+                  <img src="${faceData.imgAbah}" alt="Abah" loading="lazy" style="width:100%; height:auto; object-fit:cover; border-radius:6px;">
+                  <span style="margin-top:6px; font-family:'Cormorant Garamond',serif; font-size:12px; letter-spacing:0.1em; color:#7a6a4a;">Abah</span>
+                </div>
+                <div class="book-photo-frame" style="flex:1; display:flex; flex-direction:column; align-items:center;">
+                  <img src="${faceData.imgMamah}" alt="Mamah" loading="lazy" style="width:100%; height:auto; object-fit:cover; border-radius:6px;">
+                  <span style="margin-top:6px; font-family:'Cormorant Garamond',serif; font-size:12px; letter-spacing:0.1em; color:#7a6a4a;">Mamah</span>
+                </div>
+              </div>
+              <div class="book-page-footer">
+                <span>🌹</span>
+                <span>Halaman ${faceData.pageNum}</span>
               </div>
             </div>`;
         } else if (faceData.type === 'outro') {
