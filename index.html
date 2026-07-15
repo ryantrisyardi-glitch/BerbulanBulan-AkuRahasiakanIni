@@ -6370,11 +6370,16 @@
         let autoCloseTimer = null;
         let activeFrame = null;
         let isOpen = false;
+        let closingFromPopstate = false; // true saat close dipicu oleh tombol back (hindari history.back() ganda)
 
         function openZoom(frameEl) {
           if (isOpen) return;
           isOpen = true;
           activeFrame = frameEl;
+
+          // Dorong 1 history state baru saat foto dibuka, supaya tombol back (browser/mobile gesture)
+          // menutup foto dulu (1x klik), bukan langsung keluar dari halaman.
+          history.pushState({ grPhotoZoom: true }, '');
 
           const svgEl = document.getElementById('gr-room-svg');
           const vb = svgEl.viewBox.baseVal;
@@ -6437,6 +6442,16 @@
 
         function closeZoom() {
           if (!isOpen || !activeFrame) return;
+
+          // Jika penutupan ini BUKAN dipicu oleh tombol back (mis. tap di luar foto / auto-close timeout),
+          // maka history state yang tadi kita push saat openZoom() masih "menumpuk" di history.
+          // Buang state tsb dgn history.back() supaya tombol back berikutnya langsung keluar halaman
+          // (tidak perlu 2x klik back).
+          if (!closingFromPopstate) {
+            history.back();
+          }
+          closingFromPopstate = false;
+
           clearTimeout(autoCloseTimer);
 
           const frameEl = activeFrame;
@@ -6486,6 +6501,16 @@
         // Reposisi saat resize / scroll horizontal (mobile) supaya FLIP tetap akurat jika user interaksi saat animasi
         window.addEventListener('resize', () => {
           if (isOpen) closeZoom();
+        });
+
+        // Tombol back (browser / gesture back di mobile) → tutup foto dulu, JANGAN keluar halaman.
+        // History state yang di-push saat openZoom() akan otomatis "termakan" oleh back ini,
+        // jadi tidak ada state sisa → back berikutnya baru benar-benar keluar halaman (cukup 1x klik back utk tutup foto).
+        window.addEventListener('popstate', () => {
+          if (isOpen) {
+            closingFromPopstate = true;
+            closeZoom();
+          }
         });
       })();
 
