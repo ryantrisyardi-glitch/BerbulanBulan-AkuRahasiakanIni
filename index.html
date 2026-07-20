@@ -5,6 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>Untuk Yang Tersayang</title>
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#3d2e1e">
+  <link rel="apple-touch-icon" href="./icon-192.png">
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel+Decorative:wght@400;700&family=Great+Vibes&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Playwrite+GB+J:wght@100..400&display=swap"
     rel="stylesheet">
@@ -6370,11 +6373,16 @@
         let autoCloseTimer = null;
         let activeFrame = null;
         let isOpen = false;
+        let closingFromPopstate = false; // true saat close dipicu oleh tombol back (hindari history.back() ganda)
 
         function openZoom(frameEl) {
           if (isOpen) return;
           isOpen = true;
           activeFrame = frameEl;
+
+          // Dorong 1 history state baru saat foto dibuka, supaya tombol back (browser/mobile gesture)
+          // menutup foto dulu (1x klik), bukan langsung keluar dari halaman.
+          history.pushState({ grPhotoZoom: true }, '');
 
           const svgEl = document.getElementById('gr-room-svg');
           const vb = svgEl.viewBox.baseVal;
@@ -6437,6 +6445,16 @@
 
         function closeZoom() {
           if (!isOpen || !activeFrame) return;
+
+          // Jika penutupan ini BUKAN dipicu oleh tombol back (mis. tap di luar foto / auto-close timeout),
+          // maka history state yang tadi kita push saat openZoom() masih "menumpuk" di history.
+          // Buang state tsb dgn history.back() supaya tombol back berikutnya langsung keluar halaman
+          // (tidak perlu 2x klik back).
+          if (!closingFromPopstate) {
+            history.back();
+          }
+          closingFromPopstate = false;
+
           clearTimeout(autoCloseTimer);
 
           const frameEl = activeFrame;
@@ -6486,6 +6504,16 @@
         // Reposisi saat resize / scroll horizontal (mobile) supaya FLIP tetap akurat jika user interaksi saat animasi
         window.addEventListener('resize', () => {
           if (isOpen) closeZoom();
+        });
+
+        // Tombol back (browser / gesture back di mobile) → tutup foto dulu, JANGAN keluar halaman.
+        // History state yang di-push saat openZoom() akan otomatis "termakan" oleh back ini,
+        // jadi tidak ada state sisa → back berikutnya baru benar-benar keluar halaman (cukup 1x klik back utk tutup foto).
+        window.addEventListener('popstate', () => {
+          if (isOpen) {
+            closingFromPopstate = true;
+            closeZoom();
+          }
         });
       })();
 
@@ -6795,6 +6823,18 @@
       })();
 
     })();
+  </script>
+
+  <!-- ══ Registrasi Service Worker (cache video/foto untuk jaringan lambat) ══ -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {
+          // Jika gagal register (misal dibuka dari file:// lokal), diamkan saja —
+          // app tetap jalan normal tanpa cache offline.
+        });
+      });
+    }
   </script>
 </body>
 
